@@ -1,0 +1,21 @@
+{
+  "name" : "Modularity",
+  "slug" : "modularity",
+  "author" : "<a href='https://modularity.group'>Modularity Group</a>",
+  "author_profile" : "",
+  "version" : "4.0.0",
+  "download_url" : "https://plugin.modularity.group/modularity.zip",
+  "requires" : "5.0",
+  "tested" : "5.8.3",
+  "requires_php" : "7.0",
+  "last_updated" : "2022-01-13 09:50:00",
+  "sections" : {
+    "description" : "Modular WordPress theme development system",
+    "installation" : "Install, activate and go to 'Design' and 'Modules'.",
+    "changelog" : "4.0.0 | initial release"
+  },
+  "banners" : {
+    "low" : "",
+    "high" : ""
+  }
+}
