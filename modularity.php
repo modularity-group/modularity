@@ -3,7 +3,7 @@
 Plugin Name: Modularity
 Plugin URI:  https://github.com/modularity-group/modularity
 Description: Modular wordpress development
-Version:     4.0.0
+Version:     4.0.1
 Author:      Modularity Group
 Author URI:  https://modularity.group
 Text Domain: modularity
@@ -112,12 +112,16 @@ class Modularity {
 
   private function deleter() {
     add_action('admin_init', function() {
+      if (isset($_POST["modularity_reload"])) {
+        wp_redirect("/wp-admin/admin.php?page=modularity");
+        exit;
+      }
       if (!isset($_POST["modularity_modules_delete"])) return;
       if (!is_user_logged_in()) return;
       if (!current_user_can("administrator")) return;
       if (is_dir(MODULES_DIR)) {
         $this->deleteDirectoryReccursively(MODULES_DIR);
-        header("location: /wp-admin/themes.php?page=modularity&modules_deleted");
+        wp_redirect("/wp-admin/admin.php?page=modularity&modules_deleted");
         exit;
       }
     });
@@ -132,7 +136,8 @@ class Modularity {
   }
 
   private function modulesTheme() {
-    return $this->validModules(glob(get_stylesheet_directory()."/*"));
+    $folder = is_dir(get_stylesheet_directory()."/modules") ? "/modules/*" : "/*";
+    return $this->validModules(glob(get_stylesheet_directory().$folder));
   }
 
   private function modulesAvailable() {
@@ -170,21 +175,13 @@ class Modularity {
 
   private function admin() {
     add_action('admin_menu', function() {
-      add_submenu_page(
-        "themes.php",
-        "Modules",
-        "Modules",
-        "manage_options",
-        "modularity",
-        function() {
-          include_once "modularity.template.php";
-        },
-        91
-      );
+      add_menu_page("Modules", "Modules", "manage_options", "modularity", function() {
+        include_once "modularity.template.php";
+      }, '', 61);
     });
 
     add_filter('plugin_action_links_'.plugin_basename(__FILE__), function($links){
-      $links[] = '<a href="'.admin_url('themes.php?page=modularity').'">' . __('Settings') . '</a>';
+      $links[] = '<a href="'.admin_url('admin.php?page=modularity').'">' . __('Settings') . '</a>';
       return $links;
     });
   }
@@ -241,6 +238,13 @@ class Modularity {
 
   public function get_custom_modules($endpoint) {
     return json_decode(file_get_contents($endpoint), true);
+  }
+
+  public function get_module_readme($moduleNameOrPath) {
+    $readme = MODULES_DIR . "/" . basename($moduleNameOrPath) . "/readme.md";
+    if (!file_exists($readme)) $readme = get_stylesheet_directory()."/" . basename($moduleNameOrPath) . "/readme.md";
+    if (!file_exists($readme)) $readme = get_stylesheet_directory()."/modules/" . basename($moduleNameOrPath) . "/readme.md";
+    return file_exists($readme) ? esc_attr(file_get_contents($readme)) : "";
   }
 
 }

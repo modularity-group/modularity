@@ -3,16 +3,16 @@
   "slug" : "modularity",
   "author" : "<a href='https://modularity.group'>Modularity Group</a>",
   "author_profile" : "",
-  "version" : "4.0.0",
+  "version" : "4.0.1",
   "download_url" : "https://plugin.modularity.group/modularity.zip",
   "requires" : "5.0",
-  "tested" : "5.8.3",
+  "tested" : "5.9.0",
   "requires_php" : "7.0",
-  "last_updated" : "2022-01-13 09:50:00",
+  "last_updated" : "2022-02-07 21:00:00",
   "sections" : {
     "description" : "Modular WordPress theme development system",
     "installation" : "Install, activate and go to 'Design' and 'Modules'.",
-    "changelog" : "4.0.0 | initial release"
+    "changelog" : "  4.0.1 | improve admin integration and enable load from your-theme/modules/ <br> 4.0.0 | initial release "
   },
   "banners" : {
     "low" : "",

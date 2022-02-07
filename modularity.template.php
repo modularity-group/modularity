@@ -1,41 +1,6 @@
 <?php defined("ABSPATH") or die; ?>
 
-<style>
-  .modularity {
-    width: 800px;
-    max-width: 100%;
-  }
-  .modularity code {
-    display: inline-block;
-    margin: 0 10px 10px 0;
-    border-radius: 4px;
-    background: white;
-    padding: 3px 5px 2px 5px;
-  }
-  .modularity code a {
-    color: inherit;
-  }
-  .modularity code.is-lowlighted {
-    opacity: 0.41;
-  }
-  .modularity form {
-    display: inline-block;
-  }
-  .modularity [type="submit"] {
-    background: white;
-    border: none;
-    padding: 3px 7px 2px 7px;
-    border-radius: 4px;
-    color: #555;
-    cursor: pointer;
-  }
-  .modularity [type="submit"]:hover {
-    color: red;
-  }
-  .modularity [type="submit"][value="✓"] {
-    pointer-events: none;
-  }
-</style>
+<link rel="stylesheet" href="<?= plugins_url() . '/modularity/modularity.css' ?>">
 
 <div class="modularity wrap">
 
@@ -54,9 +19,13 @@
     <?php array_push($installedAvailable, basename($module)); ?>
     <code>
       <?php if (in_array(basename($module), Modularity::get_available_modules())): ?>
-        <a target="_blank" href="https://github.com/modularity-group/<?= basename($module) ?>"><?= basename($module) ?></a>
+        <a href="https://github.com/modularity-group/<?= basename($module) ?>" target="_blank">
+          <?= basename($module) ?>
+        </a>
+        <div class="tooltip" style="display:none;"><div><?= Modularity::get_module_readme($module) ?></div></div>
       <?php else: ?>
-        <?= basename($module) ?>
+        <a><?= basename($module) ?></a>
+        <div class="tooltip" style="display:none;"><div><?= Modularity::get_module_readme($module) ?></div></div>
       <?php endif; ?>
     </code>
   <?php endforeach; ?>
@@ -74,7 +43,7 @@
       <?php if (!isset($_GET["modules_deleted"])): ?>
         <input type="submit" value="↻" name="modularity_modules_delete" onclick="return confirm('Really delete and re-install your modules?');">
       <?php else: ?>
-        <input type="submit" value="✓" onclick="return false;">
+        <input type="submit" name="modularity_reload" value="✓">
       <?php endif; ?>
     </form>
   <?php endif; ?>
@@ -83,7 +52,8 @@
 
   <?php foreach (Modularity::get_theme_modules() as $module): ?>
     <code>
-      <?= basename($module) ?>
+      <a><?= basename($module) ?></a>
+      <div class="tooltip" style="display:none;"><div><?= Modularity::get_module_readme($module) ?></div></div>
     </code>
   <?php endforeach; ?>
 
