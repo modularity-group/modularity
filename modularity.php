@@ -3,7 +3,7 @@
 Plugin Name: Modularity
 Plugin URI:  https://github.com/modularity-group/modularity
 Description: Modular wordpress development
-Version:     4.0.1
+Version:     4.0.2
 Author:      Modularity Group
 Author URI:  https://modularity.group
 Text Domain: modularity
@@ -116,7 +116,7 @@ class Modularity {
         wp_redirect("/wp-admin/admin.php?page=modularity");
         exit;
       }
-      if (!isset($_POST["modularity_modules_delete"])) return;
+      if (!isset($_POST["modularity_modules_delete"]) && !isset($_GET["force-delete"])) return;
       if (!is_user_logged_in()) return;
       if (!current_user_can("administrator")) return;
       if (is_dir(MODULES_DIR)) {
@@ -245,6 +245,40 @@ class Modularity {
     if (!file_exists($readme)) $readme = get_stylesheet_directory()."/" . basename($moduleNameOrPath) . "/readme.md";
     if (!file_exists($readme)) $readme = get_stylesheet_directory()."/modules/" . basename($moduleNameOrPath) . "/readme.md";
     return file_exists($readme) ? esc_attr(file_get_contents($readme)) : "";
+  }
+
+  public function get_module_version($moduleNameOrPath) {
+    $readme = $this->get_module_readme($moduleNameOrPath);
+    preg_match_all("/Version:\s([0-9]+.[0-9]+.[0-9]+)/", $readme, $_version);
+    $version = $_version ? $_version[1][0] : false;
+
+    if ($version) {
+      $latest = $this->get_set_module_latest_tag(basename($moduleNameOrPath));
+      if ($latest && str_replace("v","",$latest) > str_replace("v","",$version)) {
+        return "v$version <strong>→ $latest</strong>";
+      }
+      return "v$version";
+    }
+    return "";
+  }
+
+  public function get_set_module_latest_tag($moduleSlug) {
+    if (get_transient("module_" . $moduleSlug . "_latest_tag")) {
+      return get_transient("module_" . $moduleSlug . "_latest_tag");
+    }
+    $curl = curl_init();
+    curl_setopt($curl,CURLOPT_URL, "https://api.github.com/repos/modularity-group/$moduleSlug/git/refs/tags");
+    curl_setopt($curl,CURLOPT_RETURNTRANSFER,1);
+    curl_setopt($curl,CURLOPT_CONNECTTIMEOUT,1);
+    curl_setopt($curl, CURLOPT_USERAGENT, "Modularity");
+    $info = curl_exec($curl);
+    curl_close($curl);
+
+    $tags = json_decode($info);
+    if (!is_array($tags)) return;
+    $latest = basename(array_reverse($tags)[0]->ref);
+    set_transient("module_" . $moduleSlug . "_latest_tag", $latest, 1800);
+    return $latest;
   }
 
 }

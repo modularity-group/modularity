@@ -12,7 +12,7 @@
   <p>created by <a href="https://modularity.group">https://modularity.group</a></p>
   <p>version <?= get_plugin_data(dirname(__FILE__) . '/modularity.php')['Version'] ?>
 
-  <h2>you have <?= count(Modularity::get_plugin_modules()) ?> modules installed from your <a href="theme-editor.php?file=modules.json">modules.json</a></h2>
+  <h2>you have <?= count(Modularity::get_plugin_modules()) ?> module<?= count(Modularity::get_plugin_modules()) !==1 ? "s" : ""; ?> installed from your <a href="theme-editor.php?file=modules.json">modules.json</a></h2>
 
   <?php $installedAvailable = []; ?>
   <?php foreach (Modularity::get_plugin_modules() as $module): ?>
@@ -21,10 +21,14 @@
       <?php if (in_array(basename($module), Modularity::get_available_modules())): ?>
         <a href="https://github.com/modularity-group/<?= basename($module) ?>" target="_blank">
           <?= basename($module) ?>
+          <small><?= Modularity::get_module_version($module) ?></small>
         </a>
         <div class="tooltip" style="display:none;"><div><?= Modularity::get_module_readme($module) ?></div></div>
       <?php else: ?>
-        <a><?= basename($module) ?></a>
+        <a>
+          <?= basename($module) ?>
+          <small><?= Modularity::get_module_version($module) ?></small>
+        </a>
         <div class="tooltip" style="display:none;"><div><?= Modularity::get_module_readme($module) ?></div></div>
       <?php endif; ?>
     </code>
@@ -48,11 +52,14 @@
     </form>
   <?php endif; ?>
 
-  <h2>you have <?= count(Modularity::get_theme_modules()) ?> custom modules in your <a href="themes.php">theme</a></h2>
+  <h2>you have <?= count(Modularity::get_theme_modules()) ?> custom module<?= count(Modularity::get_theme_modules()) !==1 ? "s" : ""; ?> in your <a href="themes.php">theme</a></h2>
 
   <?php foreach (Modularity::get_theme_modules() as $module): ?>
     <code>
-      <a><?= basename($module) ?></a>
+      <a>
+        <?= basename($module) ?>
+        <small><?= Modularity::get_module_version($module) ?></small>
+      </a>
       <div class="tooltip" style="display:none;"><div><?= Modularity::get_module_readme($module) ?></div></div>
     </code>
   <?php endforeach; ?>

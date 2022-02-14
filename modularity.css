@@ -2,19 +2,34 @@
   width: 800px;
   max-width: 100%;
 }
+
 .modularity code {
   display: inline-block;
   margin: 0 10px 10px 0;
-  border-radius: 4px;
+  padding: 0;
   background: white;
-  padding: 3px 5px 2px 5px;
+  /*padding: 3px 5px 2px 5px;*/
+  font-size: 12px;
 }
-.modularity code a {
-  color: inherit;
-}
+
 .modularity code.is-lowlighted {
   opacity: 0.41;
 }
+
+.modularity code a {
+  border-radius: 4px;
+  color: inherit;
+  text-decoration: none;
+  padding: 0.45em 0.8em 0.4em;
+  display: inline-block;
+  transition: all 100ms ease;
+}
+
+.modularity code a:hover {
+  background: #2271b1;
+  color: #fff;
+}
+
 .modularity code a:hover + .tooltip,
 .modularity code a + .tooltip:hover {
   display: block !important;
@@ -24,14 +39,17 @@
   right: 0;
   top: 32px;
   bottom: 0;
-  width: calc(100vw - 1000px);
+  width: calc(100vw - 1050px);
   white-space: pre-line;
   background: white;
   padding: 1rem 1.5rem;
+  box-shadow: 0 0 5px #ddd;
 }
+
 .modularity form {
   display: inline-block;
 }
+
 .modularity [type="submit"] {
   background: white;
   border: none;
