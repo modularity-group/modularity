@@ -3,7 +3,7 @@
 Plugin Name: Modularity
 Plugin URI:  https://github.com/modularity-group/modularity
 Description: Modular wordpress development
-Version:     4.0.2
+Version:     4.0.3
 Author:      Modularity Group
 Author URI:  https://modularity.group
 Text Domain: modularity
@@ -50,6 +50,10 @@ class Modularity {
     if ($moduleUrlOrVersion === 'master') {
       $moduleUrl = "https://github.com/$moduleNameOrSlug/archive/refs/heads/master.zip";
     }
+    elseif (substr($moduleNameOrSlug, 0, 21) === "modularity-group/pro/") {
+      $moduleUrl = "https://pro.modularity.group/releases/".substr($moduleNameOrSlug, 21)."/{$moduleUrlOrVersion}.zip?{$this->license()}";
+
+    }
     elseif (substr($moduleUrlOrVersion, 0, 8) !== "https://") {
       $moduleUrl = "https://github.com/$moduleNameOrSlug/archive/refs/tags/v{$moduleUrlOrVersion}.zip";
     }
@@ -88,6 +92,10 @@ class Modularity {
         }
       }
     }
+  }
+
+  private function license() {
+    return get_transient("modularity_license_key");
   }
 
   private function loader() {
@@ -131,8 +139,8 @@ class Modularity {
     return array_merge($this->modulesPlugin(), $this->modulesTheme());
   }
 
-  private function modulesPlugin() {
-    return $this->validModules(glob(MODULES_DIR."/*"));
+  private function modulesPlugin($pro=false) {
+    return $this->validModules(glob(MODULES_DIR."/*"), $pro);
   }
 
   private function modulesTheme() {
@@ -140,7 +148,7 @@ class Modularity {
     return $this->validModules(glob(get_stylesheet_directory().$folder));
   }
 
-  private function modulesAvailable() {
+  private function freeModulesAvailable() {
     return [
       "core-module-style-loader",
       "core-module-script-loader",
@@ -161,11 +169,20 @@ class Modularity {
     ];
   }
 
-  private function validModules($candidates) {
+  private function proModulesAvailable() {
+    return [
+      "feature-everything-slider"
+    ];
+  }
+
+  private function validModules($candidates, $pro=false) {
     $modules = array();
     foreach ($this->moduleTypes as $prefix) {
       foreach ($candidates as $module) {
-        if (substr(basename($module), 0, strlen($prefix)) === $prefix) {
+        if (
+          substr(basename($module), 0, strlen($prefix)) === $prefix &&
+          (!$pro || in_array(basename($module), $this->get_available_pro_modules()))
+        ) {
           array_push($modules, $module);
         }
       }
@@ -176,8 +193,10 @@ class Modularity {
   private function admin() {
     add_action('admin_menu', function() {
       add_menu_page("Modules", "Modules", "manage_options", "modularity", function() {
+        $INSTALLED_PRO_MODULES = $this->get_plugin_modules(true);
+        $AVAILABLE_PRO_MODULES = $this->get_available_pro_modules();
         include_once "modularity.template.php";
-      }, '', 61);
+      }, 'dashicons-rest-api', 61);
     });
 
     add_filter('plugin_action_links_'.plugin_basename(__FILE__), function($links){
@@ -224,16 +243,20 @@ class Modularity {
     return $this->modules();
   }
 
-  public function get_plugin_modules() {
-    return $this->modulesPlugin();
+  public function get_plugin_modules($pro=false) {
+    return $this->modulesPlugin($pro);
   }
 
   public function get_theme_modules() {
     return $this->modulesTheme();
   }
 
-  public function get_available_modules() {
-    return $this->modulesAvailable();
+  public function get_available_free_modules() {
+    return $this->freeModulesAvailable();
+  }
+
+  public function get_available_pro_modules() {
+    return $this->proModulesAvailable();
   }
 
   public function get_custom_modules($endpoint) {
@@ -255,7 +278,7 @@ class Modularity {
     if ($version) {
       $latest = $this->get_set_module_latest_tag(basename($moduleNameOrPath));
       if ($latest && str_replace("v","",$latest) > str_replace("v","",$version)) {
-        return "v$version <strong>→ $latest</strong>";
+        return "v$version <strong class='update-hint'>$latest</strong>";
       }
       return "v$version";
     }
