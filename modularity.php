@@ -3,7 +3,7 @@
 Plugin Name: Modularity
 Plugin URI:  https://github.com/modularity-group/modularity
 Description: Modular wordpress development
-Version:     4.0.3
+Version:     4.0.4
 Author:      Modularity Group
 Author URI:  https://modularity.group
 Text Domain: modularity
@@ -153,6 +153,7 @@ class Modularity {
       "core-module-style-loader",
       "core-module-script-loader",
       "core-module-style-variables",
+      "core-site-stylebase",
       "config-site-template",
       "config-site-layout",
       "config-force-login",
