@@ -60,7 +60,14 @@
   <!-- PRO MODULES -->
 
   <?php if (count($INSTALLED_PRO_MODULES)): ?>
-    <h2>pro modules (<?= count($INSTALLED_PRO_MODULES) ?>)</h2>
+    <h2>
+      <?php if (Modularity::is_license_valid()): ?>
+        <span class="is-active dashicons dashicons-superhero" title="your license is active. pro modules can be installed."></span>
+      <?php else: ?>
+        <span class="is-inactive dashicons dashicons-superhero" title="license missing! pro modules can not be installed."></span>
+      <?php endif; ?>
+      pro modules (<?= count($INSTALLED_PRO_MODULES) ?>)
+    </h2>
 
     <?php $installedAvailablePro = []; ?>
     <?php foreach ($INSTALLED_PRO_MODULES as $module): ?>

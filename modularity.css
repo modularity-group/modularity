@@ -87,9 +87,17 @@
 }
 
 .modularity [type="submit"]:hover {
-  color: red;
+  color: #d63638;
 }
 
 .modularity [type="submit"][value*="✓"]:hover {
   color: green;
+}
+
+.modularity .dashicons.is-active::before {
+  color: var(--modularity-color-accent);
+}
+
+.modularity .dashicons.is-inactive::before {
+  color: #d63638;
 }

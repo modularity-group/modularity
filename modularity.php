@@ -98,6 +98,14 @@ class Modularity {
     return get_transient("modularity_license_key");
   }
 
+  private function licenseValid() {
+    $license = get_transient("modularity_license_key");
+    if ($license && strlen($license) === 8) {
+      return true;
+    }
+    return false;
+  }
+
   private function loader() {
     foreach ($this->modules() as $module) {
       $this->load($module);
@@ -234,6 +242,10 @@ class Modularity {
         new modularityUpdateChecker();
       }
     });
+  }
+
+  public function is_license_valid() {
+    return $this->licenseValid();
   }
 
   public function get_modules_json() {
