@@ -145,9 +145,9 @@ class Modularity {
 
   private function modules() {
     return array_merge(
-      $this->modulesPlugin(), 
-      $this->subModulesPlugin(), 
-      $this->modulesTheme(), 
+      $this->modulesPlugin(),
+      $this->subModulesPlugin(),
+      $this->modulesTheme(),
       $this->subModulesTheme()
     );
   }
