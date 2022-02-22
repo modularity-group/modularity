@@ -3,7 +3,7 @@
 Plugin Name: Modularity
 Plugin URI:  https://github.com/modularity-group/modularity
 Description: Modular wordpress development
-Version:     4.0.4
+Version:     4.0.5
 Author:      Modularity Group
 Author URI:  https://modularity.group
 Text Domain: modularity
@@ -144,15 +144,29 @@ class Modularity {
   }
 
   private function modules() {
-    return array_merge($this->modulesPlugin(), $this->modulesTheme());
+    return array_merge(
+      $this->modulesPlugin(), 
+      $this->subModulesPlugin(), 
+      $this->modulesTheme(), 
+      $this->subModulesTheme()
+    );
   }
 
   private function modulesPlugin($pro=false) {
     return $this->validModules(glob(MODULES_DIR."/*"), $pro);
   }
 
+  private function subModulesPlugin($pro=false) {
+    return $this->validModules(glob(MODULES_DIR."/*/modules/*"), $pro);
+  }
+
   private function modulesTheme() {
     $folder = is_dir(get_stylesheet_directory()."/modules") ? "/modules/*" : "/*";
+    return $this->validModules(glob(get_stylesheet_directory().$folder));
+  }
+
+  private function subModulesTheme() {
+    $folder = is_dir(get_stylesheet_directory()."/modules") ? "/modules/*/modules/*" : "/*/modules/*";
     return $this->validModules(glob(get_stylesheet_directory().$folder));
   }
 
@@ -161,15 +175,15 @@ class Modularity {
       "core-module-style-loader",
       "core-module-script-loader",
       "core-module-style-variables",
+      "config-css-reset",
+      "config-block-editor",
       "config-site-template",
       "config-site-layout",
       "config-force-login",
       "config-advanced-user-roles",
       "config-advanced-block-editor",
       "config-wp-cleanup",
-      "config-css-reset",
       "config-disable-comments",
-      "config-block-editor",
       "config-library-jquery",
       "config-library-slick",
       "feature-responsive-header",
