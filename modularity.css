@@ -1,31 +1,39 @@
 .modularity {
   --modularity-color-accent: #2271b1;
-  width: 800px;
   max-width: 100%;
+  /*width: 800px;*/
 }
 
 .modularity code {
-  display: inline-block;
+  display: block;
   margin: 0 10px 10px 0;
   padding: 0;
+  border-radius: 4px;
+  overflow: hidden;
   background: white;
   font-size: 12px;
-}
-
-.modularity code.is-lowlighted {
-  opacity: 0.41;
-}
-
-.modularity code a {
-  border-radius: 4px;
-  color: inherit;
-  text-decoration: none;
-  padding: 0.45em 0.8em 0.4em;
-  display: inline-block;
+  border: 1px solid white;
   transition: all 100ms ease;
 }
 
-.modularity code a:hover {
+.modularity code:hover {
+  border-color: var(--modularity-color-accent);
+}
+
+.modularity code.is-lowlighted {
+  opacity: 0.51;
+}
+
+.modularity code a.module {
+  color: inherit;
+  text-decoration: none;
+  padding: 0.45em 0.6em 0.47em 0.8em;
+  display: inline-block;
+  transition: all 100ms ease;
+  font-weight: bold;
+}
+
+.modularity code a.module:hover {
   background: var(--modularity-color-accent);
   color: #fff;
 }
@@ -35,8 +43,8 @@
   color: var(--modularity-color-accent);
 }
 
-.modularity code a:hover + .tooltip,
-.modularity code a + .tooltip:hover {
+.modularity code:hover > a + .tooltip,
+.modularity code a.module + .tooltip:hover {
   display: block !important;
   overflow-y: scroll;
   position: fixed;
@@ -44,14 +52,40 @@
   right: 0;
   top: 32px;
   bottom: 0;
-  width: calc(100vw - 1050px);
+  max-width: 50vw;
+  width: 600px;
   white-space: pre-line;
   background: white;
   padding: 1rem 1.5rem;
   box-shadow: 0 0 5px #ddd;
 }
 
-.modularity code .update-hint {
+.modularity code a[href="#update"] {
+  font-weight: normal;
+  padding: 0.45em 0.8em 0.4em 0.6em;
+  display: inline-block;
+  text-decoration: none;
+  margin-left: -6px;
+}
+
+.modularity code a[href="#update"]:hover {
+  background: var(--modularity-color-accent);
+  color: white;
+}
+
+.modularity code a.is-deleting[href="#update"] {
+  opacity: 0.61;
+  cursor: wait;
+}
+
+.modularity code a[href="#update"]:hover:after {
+  content: "↻";
+  font-size: 1.2em;
+  line-height: 0.8;
+}
+
+.modularity code .newversion {
+  text-decoration: none;
   background: var(--modularity-color-accent);
   color: white;
   display: inline-flex;
@@ -60,7 +94,7 @@
   margin-left: 1px;
 }
 
-.modularity code a:hover .update-hint {
+.modularity code a[href="#update"]:hover .newversion {
   color: var(--modularity-color-accent);
   background: white;
 }

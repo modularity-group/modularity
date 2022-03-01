@@ -16,7 +16,7 @@
     <a class="submit" href="theme-editor.php?file=modules.json">⚙ edit modules.json</a>
     <form action="" method="post">
       <?php if (!isset($_GET["modules_deleted"])): ?>
-        <input type="submit" title="delete and re-install all modules" value="↻ force modules re-install" name="modularity_modules_delete" onclick="return confirm('Really delete and re-install your modules?');">
+        <input type="submit" title="delete and re-install all modules" value="↻ force re-install modules" name="modularity_modules_delete" onclick="return confirm('Really delete and re-install your modules?');">
       <?php else: ?>
         <input type="submit" name="modularity_reload" value="✓ re-installed modules">
       <?php endif; ?>
@@ -33,18 +33,19 @@
       <?php array_push($installedAvailable, basename($module)); ?>
       <code>
         <?php if (in_array(basename($module), Modularity::get_available_free_modules())): ?>
-          <a class="module-free" href="https://github.com/modularity-group/<?= basename($module) ?>" target="_blank">
+          <a class="module module-free" href="https://github.com/modularity-group/<?= basename($module) ?>" target="_blank">
             <?= basename($module) ?>
-            <small><?= Modularity::get_module_version($module) ?></small>
           </a>
           <div class="tooltip" style="display:none;"><div><?= Modularity::get_module_readme($module) ?></div></div>
         <?php else: ?>
-          <a class="module-unknown">
+          <a class="module module-unknown">
             <?= basename($module) ?>
-            <small><?= Modularity::get_module_version($module) ?></small>
           </a>
           <div class="tooltip" style="display:none;"><div><?= Modularity::get_module_readme($module) ?></div></div>
         <?php endif; ?>
+        <a href="#update" data-module="<?= basename($module) ?>">
+          <small><?= Modularity::get_module_version($module) ?></small>
+        </a>
       </code>
     <?php endif; ?>
   <?php endforeach; ?>
@@ -52,7 +53,7 @@
   <?php foreach (Modularity::get_available_free_modules() as $module): ?>
     <?php if (!in_array($module, $installedAvailable)): ?>
       <code class="is-lowlighted">
-        <a class="module-free" target="_blank" href="https://github.com/modularity-group/<?= basename($module) ?>"><?= basename($module) ?></a>
+        <a class="module module-free" target="_blank" href="https://github.com/modularity-group/<?= basename($module) ?>"><?= basename($module) ?></a>
       </code>
     <?php endif; ?>
   <?php endforeach; ?>
@@ -74,11 +75,13 @@
       <?php if (in_array(basename($module), $AVAILABLE_PRO_MODULES)): ?>
         <?php array_push($installedAvailablePro, basename($module)); ?>
         <code>
-          <a class="module-pro" href="https://github.com/modularity-group/<?= basename($module) ?>" target="_blank">
+          <a class="module module-pro" href="https://github.com/modularity-group/<?= basename($module) ?>" target="_blank">
             <?= basename($module) ?>
-            <small><?= Modularity::get_module_version($module) ?></small>
           </a>
           <div class="tooltip" style="display:none;"><div><?= Modularity::get_module_readme($module) ?></div></div>
+          <a href="#update" data-module="<?= basename($module) ?>">
+            <small><?= Modularity::get_module_version($module) ?></small>
+          </a>
         </code>
       <?php endif; ?>
     <?php endforeach; ?>
@@ -86,7 +89,7 @@
     <?php foreach ($AVAILABLE_PRO_MODULES as $module): ?>
       <?php if (!in_array($module, $installedAvailablePro)): ?>
         <code class="is-lowlighted">
-          <a class="module-pro" target="_blank" href="https://github.com/modularity-group/<?= basename($module) ?>"><?= basename($module) ?></a>
+          <a class="module module-pro" target="_blank" href="https://github.com/modularity-group/<?= basename($module) ?>"><?= basename($module) ?></a>
         </code>
       <?php endif; ?>
     <?php endforeach; ?>
@@ -98,14 +101,16 @@
 
   <?php foreach (Modularity::get_theme_modules() as $module): ?>
     <code>
-      <a>
+      <a class="module">
         <?= basename($module) ?>
-        <small><?= Modularity::get_module_version($module) ?></small>
       </a>
       <div class="tooltip" style="display:none;"><div><?= Modularity::get_module_readme($module) ?></div></div>
+      <small><?= Modularity::get_module_version($module) ?></small>
     </code>
   <?php endforeach; ?>
 
   <br><br>
 
 </div>
+
+<script src="<?= plugins_url() . '/modularity/modularity.js' ?>"></script>

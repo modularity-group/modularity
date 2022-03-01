@@ -3,7 +3,7 @@
 Plugin Name: Modularity
 Plugin URI:  https://github.com/modularity-group/modularity
 Description: Modular wordpress development
-Version:     4.0.5
+Version:     4.0.6
 Author:      Modularity Group
 Author URI:  https://modularity.group
 Text Domain: modularity
@@ -140,6 +140,17 @@ class Modularity {
         wp_redirect("/wp-admin/admin.php?page=modularity&modules_deleted");
         exit;
       }
+    });
+
+    add_action('wp_ajax_delete_module', function(){
+      if (!isset($_POST["name"])) return;
+      if (!current_user_can("administrator")) return;
+      $module = htmlspecialchars(strip_tags($_POST['name']));
+      if (is_dir(MODULES_DIR . "/$module")) {
+        $this->deleteDirectoryReccursively(MODULES_DIR . "/$module");
+        die('true');
+      }
+      die('false');
     });
   }
 
@@ -305,7 +316,7 @@ class Modularity {
     if ($version) {
       $latest = $this->get_set_module_latest_tag(basename($moduleNameOrPath));
       if ($latest && str_replace("v","",$latest) > str_replace("v","",$version)) {
-        return "v$version <strong class='update-hint'>$latest</strong>";
+        return "v$version <strong class='newversion'>$latest</strong>";
       }
       return "v$version";
     }
