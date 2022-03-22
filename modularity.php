@@ -3,7 +3,7 @@
 Plugin Name: Modularity
 Plugin URI:  https://github.com/modularity-group/modularity
 Description: Modular wordpress development
-Version:     4.0.6
+Version:     4.0.7
 Author:      Modularity Group
 Author URI:  https://modularity.group
 Text Domain: modularity
@@ -168,7 +168,7 @@ class Modularity {
   }
 
   private function subModulesPlugin($pro=false) {
-    return $this->validModules(glob(MODULES_DIR."/*/modules/*"), $pro);
+    return $this->validModules(glob(MODULES_DIR."/[!_]*/modules/*"), $pro);
   }
 
   private function modulesTheme() {
@@ -177,7 +177,7 @@ class Modularity {
   }
 
   private function subModulesTheme() {
-    $folder = is_dir(get_stylesheet_directory()."/modules") ? "/modules/*/modules/*" : "/*/modules/*";
+    $folder = is_dir(get_stylesheet_directory()."/modules") ? "/modules/[!_]*/modules/*" : "/[!_]*/modules/*";
     return $this->validModules(glob(get_stylesheet_directory().$folder));
   }
 
@@ -205,7 +205,9 @@ class Modularity {
 
   private function proModulesAvailable() {
     return [
-      "feature-everything-slider"
+      "feature-everything-slider",
+      "feature-acf-edit-modal",
+      "feature-projects-management"
     ];
   }
 
