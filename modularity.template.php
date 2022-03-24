@@ -1,6 +1,6 @@
 <?php defined("ABSPATH") or die; ?>
 
-<link rel="stylesheet" href="<?= plugins_url() . '/modularity/modularity.css' ?>">
+<link rel="stylesheet" href="<?= plugins_url() . '/modularity/modularity.css?v=4.0.8' ?>">
 
 <div class="modularity wrap">
 
@@ -43,7 +43,7 @@
           </a>
           <div class="tooltip" style="display:none;"><div><?= Modularity::get_module_readme($module) ?></div></div>
         <?php endif; ?>
-        <a href="#update" data-module="<?= basename($module) ?>">
+        <a href="#update" data-module="<?= basename($module) ?>" data-module-version="<?= Modularity::get_module_defined_version($module) ?>">
           <small><?= Modularity::get_module_version($module) ?></small>
         </a>
       </code>
@@ -79,7 +79,7 @@
             <?= basename($module) ?>
           </a>
           <div class="tooltip" style="display:none;"><div><?= Modularity::get_module_readme($module) ?></div></div>
-          <a href="#update" data-module="<?= basename($module) ?>">
+          <a href="#update" data-module="<?= basename($module) ?>" data-module-version="<?= Modularity::get_module_defined_version($module) ?>">
             <small><?= Modularity::get_module_version($module) ?></small>
           </a>
         </code>
@@ -113,4 +113,4 @@
 
 </div>
 
-<script src="<?= plugins_url() . '/modularity/modularity.js' ?>"></script>
+<script src="<?= plugins_url() . '/modularity/modularity.js?v=4.0.8' ?>"></script>

@@ -3,7 +3,7 @@
 Plugin Name: Modularity
 Plugin URI:  https://github.com/modularity-group/modularity
 Description: Modular wordpress development
-Version:     4.0.7
+Version:     4.0.8
 Author:      Modularity Group
 Author URI:  https://modularity.group
 Text Domain: modularity
@@ -317,7 +317,7 @@ class Modularity {
 
     if ($version) {
       $latest = $this->get_set_module_latest_tag(basename($moduleNameOrPath));
-      if ($latest && str_replace("v","",$latest) > str_replace("v","",$version)) {
+      if ($latest && version_compare(str_replace("v","",$latest), str_replace("v","",$version)) === 1) {
         return "v$version <strong class='newversion'>$latest</strong>";
       }
       return "v$version";
@@ -325,23 +325,66 @@ class Modularity {
     return "";
   }
 
+  public function get_module_defined_version($moduleNameOrPath) {
+    if (!file_exists($this->modulesList)) return;
+    $modules = json_decode($this->get_modules_json(), true);
+
+    foreach ($modules as $module) {
+      $moduleNameOrSlug = strip_tags(key($module));
+      $moduleUrlOrVersion = strip_tags($module[$moduleNameOrSlug]);
+
+      if (basename($moduleNameOrSlug) == basename($moduleNameOrPath)) {
+        return $moduleUrlOrVersion;
+      }
+    }
+  }
+
   public function get_set_module_latest_tag($moduleSlug) {
     if (get_transient("module_" . $moduleSlug . "_latest_tag")) {
       return get_transient("module_" . $moduleSlug . "_latest_tag");
     }
+    $latestGitTag = $this->get_latest_version_github($moduleSlug);
+    if ($latestGitTag) {
+      set_transient("module_" . $moduleSlug . "_latest_tag", $latestGitTag, 1800);
+      return $latestGitTag;
+    }
+    $latestProVersion = $this->get_latest_version_pro($moduleSlug);
+    if ($latestProVersion) {
+      set_transient("module_" . $moduleSlug . "_latest_tag", $latestProVersion, 1800);
+      return $latestProVersion;
+    }
+    return false;
+  }
+
+  private function get_latest_version_github($moduleSlug) {
     $curl = curl_init();
     curl_setopt($curl,CURLOPT_URL, "https://api.github.com/repos/modularity-group/$moduleSlug/git/refs/tags");
     curl_setopt($curl,CURLOPT_RETURNTRANSFER,1);
     curl_setopt($curl,CURLOPT_CONNECTTIMEOUT,1);
     curl_setopt($curl, CURLOPT_USERAGENT, "Modularity");
-    $info = curl_exec($curl);
+    $res = curl_exec($curl);
     curl_close($curl);
+    $tags = json_decode($res);
+    if (is_array($tags)) {
+      return basename(array_reverse($tags)[0]->ref);
+    }
+    return false;
+  }
 
-    $tags = json_decode($info);
-    if (!is_array($tags)) return;
-    $latest = basename(array_reverse($tags)[0]->ref);
-    set_transient("module_" . $moduleSlug . "_latest_tag", $latest, 1800);
-    return $latest;
+  private function get_latest_version_pro($moduleSlug) {
+    $curl = curl_init();
+    curl_setopt($curl,CURLOPT_URL, "https://pro.modularity.group");
+    curl_setopt($curl,CURLOPT_RETURNTRANSFER,1);
+    curl_setopt($curl,CURLOPT_CONNECTTIMEOUT,1);
+    $res = curl_exec($curl);
+    curl_close($curl);
+    $modules = json_decode($res);
+    foreach ($modules as $module) {
+      if ($module->slug === $moduleSlug) {
+        return $module->version;
+      }
+    }
+    return false;
   }
 
 }

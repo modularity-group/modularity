@@ -3,7 +3,7 @@
   "slug" : "modularity",
   "author" : "<a href='https://modularity.group'>Modularity Group</a>",
   "author_profile" : "",
-  "version" : "4.0.7",
+  "version" : "4.0.8",
   "download_url" : "https://plugin.modularity.group/modularity.zip",
   "requires" : "5.0",
   "tested" : "5.9.2",
@@ -12,7 +12,7 @@
   "sections" : {
     "description" : "Modular WordPress theme development system",
     "installation" : "Install, activate and go to 'Design' and 'Modules'.",
-    "changelog" : " 4.0.7 | enable submodules underscoring <br> 4.0.6 | selective module updates and clearer modules list <br> 4.0.5 | enable sub-modules in plugin and theme, unlist core-site-stylebase <br> 4.0.4 | list new module core-site-stylebase <br> 4.0.3 | add plugin icon and tweak actions <br> 4.0.2 | enable ?force-delete modules in admin, display versions and new github tags <br> 4.0.1 | improve admin integration and enable load from your-theme/modules/ <br> 4.0.0 | initial release "
+    "changelog" : " 4.0.8 | improve updating of modules <br> 4.0.7 | enable submodules underscoring <br> 4.0.6 | selective module updates and clearer modules list <br> 4.0.5 | enable sub-modules in plugin and theme, unlist core-site-stylebase <br> 4.0.4 | list new module core-site-stylebase <br> 4.0.3 | add plugin icon and tweak actions <br> 4.0.2 | enable ?force-delete modules in admin, display versions and new github tags <br> 4.0.1 | improve admin integration and enable load from your-theme/modules/ <br> 4.0.0 | initial release "
   },
   "banners" : {
     "low" : "",
