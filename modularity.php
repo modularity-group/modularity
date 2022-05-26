@@ -3,7 +3,7 @@
 Plugin Name: Modularity
 Plugin URI:  https://github.com/modularity-group/modularity
 Description: Modular wordpress development
-Version:     4.0.8
+Version:     4.0.9
 Author:      Modularity Group
 Author URI:  https://modularity.group
 Text Domain: modularity
@@ -199,13 +199,13 @@ class Modularity {
       "config-library-slick",
       "feature-responsive-header",
       "feature-modal-page",
-      "feature-consent-dialog"
+      "feature-consent-dialog",
+      "config-scroll-animations"
     ];
   }
 
   private function proModulesAvailable() {
     return [
-      "feature-everything-slider",
       "feature-acf-edit-modal",
       "feature-projects-management"
     ];
