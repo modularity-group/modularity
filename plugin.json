@@ -3,7 +3,7 @@
   "slug" : "modularity",
   "author" : "<a href='https://modularity.group'>Modularity Group</a>",
   "author_profile" : "",
-  "version" : "4.0.8",
+  "version" : "4.0.9",
   "download_url" : "https://plugin.modularity.group/modularity.zip",
   "requires" : "5.0",
   "tested" : "6.0.0",
