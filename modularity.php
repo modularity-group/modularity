@@ -3,7 +3,7 @@
 Plugin Name: Modularity
 Plugin URI:  https://github.com/modularity-group/modularity5-plugin
 Description: Modular WordPress theme development system
-Version:     5.0.0.b1
+Version:     5.0.0.b2
 Author:      Modularity Group
 Author URI:  https://modularity.group
 Text Domain: modularity
@@ -15,48 +15,56 @@ use Padaliyajay\PHPAutoprefixer\Autoprefixer;
 
 class Modularity {
 
-  private $stylesheets;
-  private $stylesheetsEditor;
-  private $scripts;
-  private $scriptsEditor;
+  private $themeStyles;
+  private $themeScripts;
+  private $editorStyles;
+  private $editorScripts;
 
   public function __construct() {
-    $this->stylesheets = [get_stylesheet_directory() . '/style.css'];
-    $this->stylesheetsEditor = [get_stylesheet_directory() . '/style.css'];
-    $this->scripts = [];
-    $this->scriptsEditor = [];
+    $this->themeStyles = [];
+    $this->themeScripts = [];
+    $this->editorStyles = [];
+    $this->editorScripts = [];
+    
     $this->loader();
     $this->adminbar();
+    
+    $this->themeStyles[] = get_stylesheet_directory() . "/style.css";
+    $this->editorStyles[] = get_stylesheet_directory() . "/style.css";
 
-    add_action('wp_enqueue_scripts', array($this, 'frontendEnqueuer'), 20);
-    add_action('enqueue_block_editor_assets', array($this, 'editorEnqueuer'), 20);
-    add_action('wp_enqueue_scripts', array($this, 'enqueueScripts'), 20);
-    add_action('enqueue_block_editor_assets', array($this, 'enqueueScriptsEditor'), 20);
+    add_action('wp_enqueue_scripts', array($this, 'enqueueThemeStyles'), 20);
+    add_action('enqueue_block_editor_assets', array($this, 'enqueueEditorStyles'), 20);
+    add_action('wp_enqueue_scripts', array($this, 'enqueueThemeScripts'), 20);
+    add_action('enqueue_block_editor_assets', array($this, 'enqueueEditorScripts'), 20);
+  }
+
+  private function loader() {
+    foreach ($this->modules() as $module) {
+      $this->load($module);
+    }
   }
 
   private function modules() {
     return array_merge(
-      glob(dirname(__FILE__) . "/modules/[!_]*"),
-      glob(dirname(__FILE__) . "/modules/[!_]*/submodules/[!_]*"),
       glob(WP_CONTENT_DIR . "/modules/[!_]*"),
       glob(WP_CONTENT_DIR . "/modules/[!_]*/submodules/[!_]*"),
       glob(get_stylesheet_directory() . "/modules/[!_]*"),
-      glob(get_stylesheet_directory() . "/modules/[!_]*/modules/[!_]*")
+      glob(get_stylesheet_directory() . "/modules/[!_]*/submodules/[!_]*")
     );
   }
 
   private function load($module) {
     $name = basename($module);
-    $directory = basename(dirname($module)) != "submodules" ? dirname($module) : dirname(dirname($module));
+    // $directory = basename(dirname($module)) != "submodules" ? dirname($module) : dirname(dirname($module));
     $this->loadPHP("$module/$name.php");
-    if ($this->shouldCompile($module)) {
+    if ($this->shouldCompile()) {
       $this->compileSCSS("$module/$name.scss");
       $this->compileSCSS("$module/$name.editor.scss");
     }
-    $this->stylesheets[] = "$module/$name.css";
-    $this->stylesheetsEditor[] = "$module/$name.editor.css";
-    $this->scripts[] = "$module/$name.js";
-    $this->scriptsEditor[] = "$module/$name.editor.js";
+    $this->themeStyles[] = "$module/$name.css";
+    $this->editorStyles[] = "$module/$name.editor.css";
+    $this->themeScripts[] = "$module/$name.js";
+    $this->editorScripts[] = "$module/$name.editor.js";
   }
 
   private function loadPHP($modulePHP) {
@@ -71,88 +79,82 @@ class Modularity {
     }
   }
 
-  private function shouldCompile($fileDist) {
-    return isset($_GET['c']) || isset($_GET['compile']) || !file_exists($fileDist);
+  private function shouldCompile() {
+    return isset($_GET["c"]) || isset($_GET["compile"]); // || !file_exists($target);
   }
 
   private function compileSCSS($moduleSCSS) {
     if (!file_exists($moduleSCSS)) return;
-    if (!class_exists("Compiler")) require_once dirname(__FILE__) . '/vendor/autoload.php';
+    if (!class_exists("Compiler")) {
+      require_once dirname(__FILE__) . "/vendor/autoload.php";
+    }
     $compiler = new Compiler();
     $compiler->setOutputStyle(OutputStyle::COMPRESSED);
     $compiler->addImportPath(dirname($moduleSCSS));
     $scss = trim(@file_get_contents($moduleSCSS));
-    if (!$scss) return;
+    if (!$scss) {
+      unlink($this->sassToCssPath($moduleSCSS));
+      return;
+    }
     try {
       $css = $compiler->compileString($scss)->getCss();
-      $this->saveSCSS($moduleSCSS, $css);
-      if (strpos($scss, 'generate_editor_styles=true')) {
-        // $cssEditor = $compiler->compileString('.editor-styles-wrapper .is-root-container {'.$scss.'}')->getCss();
-        // $this->saveSCSS($moduleSCSS, $cssEditor);
+      $this->autoprefixSaveSCSS($moduleSCSS, $css);
+
+      if (strpos($scss, "generate_editor_styles")) {
+        $cssEditor = $compiler->compileString('.editor-styles-wrapper .is-root-container {'.$scss.'}')->getCss();
+        $this->autoprefixSaveSCSS(str_replace(".scss", ".editor.scss", $moduleSCSS), $cssEditor);
       }
     }
     catch (Exception $e) {
-      echo "Compiler error in $scss:<br>" . $e->getMessage();
+      echo "Compile error in $scss:<br>" . $e->getMessage();
     }
   }
 
-  private function saveSCSS($moduleSCSS, $css) {
-    $css = str_replace('@charset "UTF-8";', '', $css);
-    $autoprefixer = new Autoprefixer($css);
+  private function autoprefixSaveSCSS($moduleSCSS, $css) {
+    $autoprefixer = new Autoprefixer('@charset "UTF-8";' . $css);
     $css = $autoprefixer->compile();
-    return file_put_contents(str_replace(".scss", ".css", $moduleSCSS), $css);
+    return file_put_contents($this->sassToCssPath($moduleSCSS), $css);
   }
 
-  private function loader() {
-    foreach ($this->modules() as $module) {
-      $this->load($module);
-    }
+  public function enqueueEditorStyles() {
+    $this->enqueueStyles($this->editorStyles);
   }
 
-  public function editorEnqueuer() {
-    $this->enqueue($this->stylesheetsEditor);
+  public function enqueueThemeStyles() {
+    $this->enqueueStyles($this->themeStyles);
   }
 
-  public function frontendEnqueuer() {
-    $this->enqueue($this->stylesheets);
-  }
-
-  public function enqueue($stylesheets=[]) {
+  public function enqueueStyles($stylesheets=[]) {
     foreach ($stylesheets as $file) {
       if (file_exists($file)) {        
-        wp_enqueue_style(basename($file, ".css"), $this->directoryToPath($file), [], filemtime($file), 'all');
+        wp_enqueue_style(basename($file, ".css"), $this->dirToPath($file), [], filemtime($file), 'all');
       }
     }
   }
 
-  public function enqueueScripts() {
-    $this->enqueueScript($this->scripts);
+  public function enqueueThemeScripts() {
+    $this->enqueueScripts($this->themeScripts);
   }
 
-  public function enqueueScriptsEditor() {
-    $this->enqueueScript($this->scriptsEditor);
+  public function enqueueEditorScripts() {
+    $this->enqueueScripts($this->editorScripts);
   }
 
-  private function enqueueScript($scripts=[]) {
+  private function enqueueScripts($scripts=[]) {
     foreach ($scripts as $file) {
       if (file_exists($file)) {
-        wp_enqueue_script(basename($file, ".js"), $this->directoryToPath($file), ["jquery"], filemtime($file), true);
+        wp_enqueue_script(basename($file, ".js"), $this->dirToPath($file), ["jquery"], filemtime($file), true);
       }
     }
   }
 
-  private function directoryToPath($directory) {
+  private function dirToPath($directory) {
     return "/wp-content/" . explode("/wp-content/", $directory)[1];
   }
 
-  // private function updater() {
-    // add_action('admin_init', function() {
-    //   include_once "modularity.update.php";
-    //   if (class_exists('modularityUpdateChecker')) {
-    //     new modularityUpdateChecker();
-    //   }
-    // });
-  // }
+  private function sassToCssPath($scss) {
+    return str_replace(".scss", ".css", $scss);
+  }
 
   private function adminbar() {
     add_action('admin_bar_menu', function($wp_admin_bar) {
@@ -171,29 +173,6 @@ class Modularity {
       }
     }, 999);
   }
-
-  // private function freeModulesAvailable() {
-  //   return [
-  //     "core-module-style-loader",
-  //     "core-module-script-loader",
-  //     "core-module-style-variables",
-  //     "config-css-reset",
-  //     "config-block-editor",
-  //     "config-site-template",
-  //     "config-site-layout",
-  //     "config-force-login",
-  //     "config-advanced-user-roles",
-  //     "config-advanced-block-editor",
-  //     "config-wp-cleanup",
-  //     "config-disable-comments",
-  //     "config-library-jquery",
-  //     "config-library-slick",
-  //     "feature-responsive-header",
-  //     "feature-modal-page",
-  //     "feature-consent-dialog",
-  //     "config-scroll-animations"
-  //   ];
-  // }
 
 }
 
