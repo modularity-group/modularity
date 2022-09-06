@@ -3,7 +3,7 @@
 Plugin Name: Modularity
 Plugin URI:  https://github.com/modularity-group/modularity5-plugin
 Description: Modular WordPress theme development system
-Version:     5.0.x
+Version:     5.0.0.b1
 Author:      Modularity Group
 Author URI:  https://modularity.group
 Text Domain: modularity
@@ -15,10 +15,23 @@ use Padaliyajay\PHPAutoprefixer\Autoprefixer;
 
 class Modularity {
 
+  private $stylesheets;
+  private $stylesheetsEditor;
+  private $scripts;
+  private $scriptsEditor;
+
   public function __construct() {
+    $this->stylesheets = [get_stylesheet_directory() . '/style.css'];
+    $this->stylesheetsEditor = [get_stylesheet_directory() . '/style.css'];
+    $this->scripts = [];
+    $this->scriptsEditor = [];
     $this->loader();
-    $this->updater();
     $this->adminbar();
+
+    add_action('wp_enqueue_scripts', array($this, 'frontendEnqueuer'), 20);
+    add_action('enqueue_block_editor_assets', array($this, 'editorEnqueuer'), 20);
+    add_action('wp_enqueue_scripts', array($this, 'enqueueScripts'), 20);
+    add_action('enqueue_block_editor_assets', array($this, 'enqueueScriptsEditor'), 20);
   }
 
   private function modules() {
@@ -36,12 +49,14 @@ class Modularity {
     $name = basename($module);
     $directory = basename(dirname($module)) != "submodules" ? dirname($module) : dirname(dirname($module));
     $this->loadPHP("$module/$name.php");
-    $this->enqueueFrontendJS("$module/$name.js");
-    $this->enqueueBackendJS("$module/$name.editor.js");
-    $this->compileSCSS("$module/$name.scss");
-    $this->compileSCSS("$module/$name.editor.scss");
-    $this->enqueueFrontendCSS("$module/$name.css");
-    $this->enqueueBackendCSS("$module/$name.editor.css");
+    if ($this->shouldCompile($module)) {
+      $this->compileSCSS("$module/$name.scss");
+      $this->compileSCSS("$module/$name.editor.scss");
+    }
+    $this->stylesheets[] = "$module/$name.css";
+    $this->stylesheetsEditor[] = "$module/$name.editor.css";
+    $this->scripts[] = "$module/$name.js";
+    $this->scriptsEditor[] = "$module/$name.editor.js";
   }
 
   private function loadPHP($modulePHP) {
@@ -60,44 +75,12 @@ class Modularity {
     return isset($_GET['c']) || isset($_GET['compile']) || !file_exists($fileDist);
   }
 
-  // private function compileJS($moduleJS, $moduleDist) {
-  //   if (shouldCompile($moduleDist)) {
-  //     file_put_contents($moduleDist, file_get_contents($moduleJS), FILE_APPEND);
-  //   }
-  // }
-
-  private function enqueueFrontendJS($moduleJS) {
-    if (!file_exists($moduleJS)) return;
-    add_action("wp_enqueue_scripts", function(){
-      wp_enqueue_script(
-        basename($moduleJS) . ".js",
-        "/wp-content/" . explode("/wp-content/", $moduleJS)[1],
-        array("wp-blocks"),
-        filemtime($moduleJS),
-        true
-      );
-    }, 900);
-  }
-
-  private function enqueueBackendJS($moduleJS) {
-    if (!file_exists($moduleJS)) return;
-    add_action("enqueue_block_editor_assets", function(){
-      wp_enqueue_script(
-        basename($moduleJS) . ".js",
-        "/wp-content/" . explode("/wp-content/", $moduleJS)[1],
-        array(),
-        filemtime($moduleJS),
-        true
-      );
-    }, 900);
-  }
-
   private function compileSCSS($moduleSCSS) {
     if (!file_exists($moduleSCSS)) return;
     if (!class_exists("Compiler")) require_once dirname(__FILE__) . '/vendor/autoload.php';
     $compiler = new Compiler();
     $compiler->setOutputStyle(OutputStyle::COMPRESSED);
-    // $compiler->addImportPath( MODULES_DIR."/$basename/" );
+    $compiler->addImportPath(dirname($moduleSCSS));
     $scss = trim(@file_get_contents($moduleSCSS));
     if (!$scss) return;
     try {
@@ -120,66 +103,56 @@ class Modularity {
     return file_put_contents(str_replace(".scss", ".css", $moduleSCSS), $css);
   }
 
-  private function enqueueFrontendCSS($moduleCSS) {
-    if (!file_exists($moduleCSS)) return;
-    wp_enqueue_style(
-      basename($moduleCSS) . ".css",
-      "/wp-content/" . explode("/wp-content/", $moduleCSS)[1],
-      array(),
-      filemtime($moduleCSS),
-      'all'
-    );
-  }
-
-  private function enqueueBackendCSS($moduleCSS) {
-    if (!file_exists($moduleCSS)) return;
-    add_action("enqueue_block_editor_assets", function(){
-      wp_enqueue_style(
-        basename($moduleCSS) . ".css",
-        "/wp-content/" . explode("/wp-content/", $moduleCSS)[1],
-        array(),
-        filemtime($moduleCSS),
-        'all'
-      );
-    }, 900);
-  }
-
-  private function enqueueStylesheets() {
-    add_action('enqueue_block_editor_assets', function(){
-      $this->enqueueStylesheet();
-    }, 20);
-    add_action('admin_enqueue_scripts', function(){
-      $this->enqueueStylesheet();
-    }, 20);
-    add_action('wp_enqueue_scripts', function(){
-      $this->enqueueStylesheet();
-    }, 20);
-  }
-
-  private function enqueueStylesheet() {
-    wp_enqueue_style(
-      'theme-styleshet',
-      get_stylesheet_directory_uri() . '/style.css',
-      array('theme-editor-styles'),
-      filemtime( get_stylesheet_directory() . '/style.css' ),
-      'all'
-    );
-  }
-
   private function loader() {
     foreach ($this->modules() as $module) {
       $this->load($module);
     }
   }
 
-  private function updater() {
+  public function editorEnqueuer() {
+    $this->enqueue($this->stylesheetsEditor);
+  }
+
+  public function frontendEnqueuer() {
+    $this->enqueue($this->stylesheets);
+  }
+
+  public function enqueue($stylesheets=[]) {
+    foreach ($stylesheets as $file) {
+      if (file_exists($file)) {        
+        wp_enqueue_style(basename($file, ".css"), $this->directoryToPath($file), [], filemtime($file), 'all');
+      }
+    }
+  }
+
+  public function enqueueScripts() {
+    $this->enqueueScript($this->scripts);
+  }
+
+  public function enqueueScriptsEditor() {
+    $this->enqueueScript($this->scriptsEditor);
+  }
+
+  private function enqueueScript($scripts=[]) {
+    foreach ($scripts as $file) {
+      if (file_exists($file)) {
+        wp_enqueue_script(basename($file, ".js"), $this->directoryToPath($file), ["jquery"], filemtime($file), true);
+      }
+    }
+  }
+
+  private function directoryToPath($directory) {
+    return "/wp-content/" . explode("/wp-content/", $directory)[1];
+  }
+
+  // private function updater() {
     // add_action('admin_init', function() {
     //   include_once "modularity.update.php";
     //   if (class_exists('modularityUpdateChecker')) {
     //     new modularityUpdateChecker();
     //   }
     // });
-  }
+  // }
 
   private function adminbar() {
     add_action('admin_bar_menu', function($wp_admin_bar) {
@@ -188,7 +161,7 @@ class Modularity {
           array(
             'id' => 'modularity-compile',
             'title' => 'Compile Modules',
-            'href' => home_url("?compile")
+            'href' => home_url("?compile"),
             'meta' => array(
               'class' => 'modularity-compile',
               'title' => 'Compile Modules'
