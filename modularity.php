@@ -3,7 +3,7 @@
 Plugin Name: Modularity
 Plugin URI:  https://github.com/modularity-group/modularity5-plugin
 Description: Modular WordPress theme development system
-Version:     5.0.0.b3
+Version:     5.0.0.b4
 Author:      Modularity Group
 Author URI:  https://modularity.group
 Text Domain: modularity
@@ -15,21 +15,17 @@ use Padaliyajay\PHPAutoprefixer\Autoprefixer;
 
 class Modularity {
 
-  private $extModules;
   private $themeStyles;
   private $themeScripts;
   private $editorStyles;
   private $editorScripts;
 
   public function __construct() {
-    $this->extModules = get_stylesheet_directory() . "/modules.json";
     $this->themeStyles = [];
     $this->themeScripts = [];
     $this->editorStyles = [];
     $this->editorScripts = [];
     
-    $this->deleter();
-    $this->installer();
     $this->loader();
     $this->adminbar();
     
@@ -40,62 +36,6 @@ class Modularity {
     add_action('enqueue_block_editor_assets', array($this, 'enqueueEditorStyles'), 20);
     add_action('wp_enqueue_scripts', array($this, 'enqueueThemeScripts'), 20);
     add_action('enqueue_block_editor_assets', array($this, 'enqueueEditorScripts'), 20);
-  }
-
-  private function installer() {
-    if (!file_exists($this->extModules)) return;
-    if (!is_dir(WP_CONTENT_DIR . "/modules")) mkdir(WP_CONTENT_DIR . "/modules");
-    $modules = json_decode(@file_get_contents($this->extModules), true);
-    foreach ($modules as $module) {
-      $moduleNameOrSlug = strip_tags(key($module));
-      $moduleUrlOrVersion = strip_tags($module[$moduleNameOrSlug]);
-      if (!file_exists(WP_CONTENT_DIR . "/modules/" . basename($moduleNameOrSlug))) {
-        $this->install($moduleNameOrSlug, $moduleUrlOrVersion);
-      }
-    }
-    return count($modules);
-  }
-
-  private function install($moduleNameOrSlug, $moduleUrlOrVersion) {
-    if (empty($moduleNameOrSlug)) return;
-    if (empty($moduleUrlOrVersion)) return;
-    $moduleUrl = $moduleUrlOrVersion;
-    if ($moduleUrlOrVersion === 'master') {
-      $moduleUrl = "https://github.com/$moduleNameOrSlug/archive/refs/heads/master.zip";
-    }
-    elseif (substr($moduleUrlOrVersion, 0, 8) !== "https://") {
-      $moduleUrl = "https://github.com/$moduleNameOrSlug/archive/refs/tags/v{$moduleUrlOrVersion}.zip";
-    }
-    $archive = @file_get_contents($moduleUrl);
-    if (!$archive) {
-      add_action("admin_notices", function() use ($moduleNameOrSlug) {
-        echo "<div class='notice notice-error'><p>Could not install module <b>$moduleNameOrSlug</b>.</p></div>";
-      });
-      return;
-    }
-    $archivePath = WP_CONTENT_DIR . "/modules" . "/" . basename($moduleUrl);
-    if (file_exists($archivePath)) return;
-    if (file_put_contents($archivePath, $archive)) {
-      $zip = new ZipArchive;
-      if ($zip->open($archivePath) === true) {
-        $archiveEntry = $zip->getNameIndex(0);
-        $zip->extractTo(WP_CONTENT_DIR . "/modules");
-        $zip->close();
-        unlink($archivePath);
-        if (is_dir(WP_CONTENT_DIR . "/modules/$archiveEntry")) {
-          $moduleNameClean = false;
-          if (preg_match("/-(\d+.)?(\d+.)?(\d+\/)/", $archiveEntry)) {
-            $moduleNameClean = preg_replace("/-(\d+.)?(\d+.)?(\d+)/", "", $archiveEntry);
-          }
-          elseif (preg_match("/-master\//", $archiveEntry)) {
-            $moduleNameClean = preg_replace("/-master\//", "/", $archiveEntry);
-          }
-          if ($moduleNameClean) {
-            $renameModule = rename(WP_CONTENT_DIR . "/modules/$archiveEntry", WP_CONTENT_DIR . "/modules/$moduleNameClean");
-          }
-        }
-      }
-    }
   }
 
   private function loader() {
@@ -115,7 +55,6 @@ class Modularity {
 
   private function load($module) {
     $name = basename($module);
-    // $directory = basename(dirname($module)) != "submodules" ? dirname($module) : dirname(dirname($module));
     $this->loadPHP("$module/$name.php");
     if ($this->shouldCompile()) {
       $this->compileSCSS("$module/$name.scss");
@@ -149,7 +88,6 @@ class Modularity {
       require_once dirname(__FILE__) . "/vendor/autoload.php";
     }
     $compiler = new Compiler();
-    $compiler->setOutputStyle(OutputStyle::COMPRESSED);
     $compiler->addImportPath(dirname($moduleSCSS));
     $scss = trim(@file_get_contents($moduleSCSS));
     if (!$scss) {
@@ -219,19 +157,6 @@ class Modularity {
   private function adminbar() {
     add_action('admin_bar_menu', function($wp_admin_bar) {
       if (current_user_can('administrator')) {
-        if (file_exists($this->extModules)) {
-          $wp_admin_bar->add_node(
-            array(
-              'id' => 'modularity-delete',
-              'title' => 'Install Modules (' . $this->installer() . ')',
-              'href' => home_url("?install"),
-              'meta' => array(
-                'class' => 'modularity-delete',
-                'title' => 'Install Modules'
-              )
-            )
-          );
-        }
         $wp_admin_bar->add_node(
           array(
             'id' => 'modularity-compile',
@@ -245,37 +170,6 @@ class Modularity {
         );
       }
     }, 999);
-  }
-
-  private function deleter() {
-    add_action('init', function() {
-      if (!isset($_GET["install"])) return;
-      if (!current_user_can("administrator")) return;
-      if (!file_exists($this->extModules)) return;
-      if (is_dir(WP_CONTENT_DIR . "/modules")) {
-        $this->deleteDirectoryReccursively(WP_CONTENT_DIR . "/modules");
-        wp_redirect(home_url("?compile"));
-        exit;
-      }
-    });
-  }
-
-  private function deleteDirectoryReccursively($directory) {
-    if (is_dir($directory)) {
-      $objects = scandir($directory);
-      foreach ($objects as $object) {
-        if ($object != "." && $object != "..") {
-          $path = "$directory/$object";
-          if (filetype($path) == "dir") {
-            $this->deleteDirectoryReccursively($path);
-          } else {
-            unlink($path);
-          }
-        }
-      }
-      reset($objects);
-      rmdir($directory);
-    }
   }
 
 }

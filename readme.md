@@ -3,7 +3,7 @@
 
 Modular WordPress theme development system.
 
-Version 5.0.0.b3
+Version 5.0.0.b4
 
 https://modularity.group
 
@@ -29,5 +29,3 @@ https://modularity.group
 3. Looking in `foomodule/submodules/barmodule` to do the same
 
 4. Adds a `Compile Modules` button to the adminbar for administrators
-
-5. Allows external modules installation from theme `modules.json` via GitHub or Zip-URL
