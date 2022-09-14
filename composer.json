@@ -1,0 +1,6 @@
+{
+    "require": {
+        "scssphp/scssphp": "^1.11",
+        "padaliyajay/php-autoprefixer": "^1.4"
+    }
+}
