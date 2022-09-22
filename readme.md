@@ -3,7 +3,7 @@
 
 Modular WordPress theme development system.
 
-Version 5.0.0.b4
+Version 5
 
 https://modularity.group
 

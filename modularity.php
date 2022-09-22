@@ -3,7 +3,7 @@
 Plugin Name: Modularity
 Plugin URI:  https://github.com/modularity-group/modularity5-plugin
 Description: Modular WordPress theme development system
-Version:     5.0.0.b4
+Version:     5.0.0.b5
 Author:      Modularity Group
 Author URI:  https://modularity.group
 Text Domain: modularity
@@ -125,7 +125,7 @@ class Modularity {
   public function enqueueStyles($stylesheets=[]) {
     foreach ($stylesheets as $file) {
       if (file_exists($file)) {        
-        wp_enqueue_style(basename($file, ".css"), $this->dirToPath($file), [], filemtime($file), 'all');
+        wp_enqueue_style("module-".basename($file, ".css"), $this->dirToPath($file), [], filemtime($file), 'all');
       }
     }
   }
@@ -141,7 +141,7 @@ class Modularity {
   private function enqueueScripts($scripts=[]) {
     foreach ($scripts as $file) {
       if (file_exists($file)) {
-        wp_enqueue_script(basename($file, ".js"), $this->dirToPath($file), ["jquery"], filemtime($file), true);
+        wp_enqueue_script("module-".basename($file, ".js"), $this->dirToPath($file), ["jquery"], filemtime($file), true);
       }
     }
   }
