@@ -1,9 +1,14 @@
 {
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "f5182ff453db19b5a4505dd52235d837",
     "packages": [
         {
             "name": "padaliyajay/php-autoprefixer",
             "version": "1.4",
-            "version_normalized": "1.4.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/padaliyajay/php-autoprefixer.git",
@@ -18,9 +23,7 @@
             "require": {
                 "sabberworm/php-css-parser": "*"
             },
-            "time": "2022-08-02T02:37:28+00:00",
             "type": "library",
-            "installation-source": "dist",
             "autoload": {
                 "psr-4": {
                     "Padaliyajay\\PHPAutoprefixer\\": "src"
@@ -40,12 +43,11 @@
                 "issues": "https://github.com/padaliyajay/php-autoprefixer/issues",
                 "source": "https://github.com/padaliyajay/php-autoprefixer/tree/1.4"
             },
-            "install-path": "../padaliyajay/php-autoprefixer"
+            "time": "2022-08-02T02:37:28+00:00"
         },
         {
             "name": "sabberworm/php-css-parser",
             "version": "8.4.0",
-            "version_normalized": "8.4.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sabberworm/PHP-CSS-Parser.git",
@@ -68,9 +70,7 @@
             "suggest": {
                 "ext-mbstring": "for parsing UTF-8 CSS"
             },
-            "time": "2021-12-11T13:40:54+00:00",
             "type": "library",
-            "installation-source": "dist",
             "autoload": {
                 "psr-4": {
                     "Sabberworm\\CSS\\": "src/"
@@ -96,12 +96,11 @@
                 "issues": "https://github.com/sabberworm/PHP-CSS-Parser/issues",
                 "source": "https://github.com/sabberworm/PHP-CSS-Parser/tree/8.4.0"
             },
-            "install-path": "../sabberworm/php-css-parser"
+            "time": "2021-12-11T13:40:54+00:00"
         },
         {
             "name": "scssphp/scssphp",
             "version": "v1.11.0",
-            "version_normalized": "1.11.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/scssphp/scssphp.git",
@@ -133,7 +132,6 @@
                 "ext-iconv": "Can be used as fallback when ext-mbstring is not available",
                 "ext-mbstring": "For best performance, mbstring should be installed as it is faster than ext-iconv"
             },
-            "time": "2022-09-02T21:24:55+00:00",
             "bin": [
                 "bin/pscss"
             ],
@@ -144,7 +142,6 @@
                     "bin-links": false
                 }
             },
-            "installation-source": "dist",
             "autoload": {
                 "psr-4": {
                     "ScssPhp\\ScssPhp\\": "src/"
@@ -179,9 +176,16 @@
                 "issues": "https://github.com/scssphp/scssphp/issues",
                 "source": "https://github.com/scssphp/scssphp/tree/v1.11.0"
             },
-            "install-path": "../scssphp/scssphp"
+            "time": "2022-09-02T21:24:55+00:00"
         }
     ],
-    "dev": true,
-    "dev-package-names": []
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": [],
+    "plugin-api-version": "2.0.0"
 }

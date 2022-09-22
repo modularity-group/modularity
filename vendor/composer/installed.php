@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => '0d8451adebdaaa94c2c57b0c043c764ddd69d7a2',
+    'reference' => '16fe31fb8d294241956b18c36428582c77e9c354',
     'name' => '__root__',
   ),
   'versions' => 
@@ -18,7 +18,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => '0d8451adebdaaa94c2c57b0c043c764ddd69d7a2',
+      'reference' => '16fe31fb8d294241956b18c36428582c77e9c354',
     ),
     'padaliyajay/php-autoprefixer' => 
     array (
@@ -40,12 +40,12 @@
     ),
     'scssphp/scssphp' => 
     array (
-      'pretty_version' => 'v1.10.5',
-      'version' => '1.10.5.0',
+      'pretty_version' => 'v1.11.0',
+      'version' => '1.11.0.0',
       'aliases' => 
       array (
       ),
-      'reference' => '6d44282ccf283e133ab70b6282f8e068ff2f9bf9',
+      'reference' => '33749d12c2569bb24071f94e9af828662dabb068',
     ),
   ),
 );

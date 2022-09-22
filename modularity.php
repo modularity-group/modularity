@@ -25,17 +25,15 @@ class Modularity {
     $this->themeScripts = [];
     $this->editorStyles = [];
     $this->editorScripts = [];
-    
     $this->loader();
     $this->adminbar();
-    
     $this->themeStyles[] = get_stylesheet_directory() . "/style.css";
     $this->editorStyles[] = get_stylesheet_directory() . "/style.css";
 
-    add_action('wp_enqueue_scripts', array($this, 'enqueueThemeStyles'), 20);
-    add_action('enqueue_block_editor_assets', array($this, 'enqueueEditorStyles'), 20);
-    add_action('wp_enqueue_scripts', array($this, 'enqueueThemeScripts'), 20);
-    add_action('enqueue_block_editor_assets', array($this, 'enqueueEditorScripts'), 20);
+    add_action('wp_enqueue_scripts', [$this, 'enqueueThemeStyles'], 20);
+    add_action('enqueue_block_editor_assets', [$this, 'enqueueEditorStyles'], 20);
+    add_action('wp_enqueue_scripts', [$this, 'enqueueThemeScripts'], 20);
+    add_action('enqueue_block_editor_assets', [$this, 'enqueueEditorScripts'], 20);
   }
 
   private function loader() {
@@ -158,15 +156,15 @@ class Modularity {
     add_action('admin_bar_menu', function($wp_admin_bar) {
       if (current_user_can('administrator')) {
         $wp_admin_bar->add_node(
-          array(
+          [
             'id' => 'modularity-compile',
             'title' => 'Compile Modules',
             'href' => home_url("?compile"),
-            'meta' => array(
+            'meta' => [
               'class' => 'modularity-compile',
               'title' => 'Compile Modules'
-            )
-          )
+            ]
+          ]
         );
       }
     }, 999);
