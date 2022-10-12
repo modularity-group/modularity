@@ -1,14 +1,14 @@
 
 # Modularity
 
-Modular WordPress theme development system.
+Modular WordPress theme development system
 
-Version 5
+Version 5, MIT License
 
-https://modularity.group
+https://www.modularity.group
 
 
-## What is does
+## What this plugin does
 
 1. Enqueues the theme `style.css` in frontend and admin block editor
 

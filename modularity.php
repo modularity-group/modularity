@@ -1,11 +1,11 @@
 <?php defined("ABSPATH") or die;
 /*
 Plugin Name: Modularity
-Plugin URI:  https://github.com/modularity-group/modularity5-plugin
-Description: Modular WordPress theme development system
-Version:     5.0.0.b5
+Plugin URI:  https://github.com/modularity5-group/modularity
+Description: WordPress plugin for modular theme development
+Version:     5.0.0
 Author:      Modularity Group
-Author URI:  https://modularity.group
+Author URI:  https://www.modularity.group
 Text Domain: modularity
 */
 
@@ -77,7 +77,7 @@ class Modularity {
   }
 
   private function shouldCompile() {
-    return isset($_GET["c"]) || isset($_GET["compile"]); // || !file_exists($target);
+    return isset($_GET["c"]) || isset($_GET["compile"]);
   }
 
   private function compileSCSS($moduleSCSS) {
@@ -159,17 +159,12 @@ class Modularity {
           [
             'id' => 'modularity-compile',
             'title' => 'Compile Modules',
-            'href' => home_url("?compile"),
-            'meta' => [
-              'class' => 'modularity-compile',
-              'title' => 'Compile Modules'
-            ]
+            'href' => home_url("?compile")
           ]
         );
       }
     }, 999);
   }
-
 }
 
 $Modularity = new Modularity();
