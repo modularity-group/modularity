@@ -1,7 +1,7 @@
 
 # Modularity
 
-Modular WordPress theme development system
+Modular Development-System for WordPress
 
 Version 5, MIT License
 
@@ -12,20 +12,20 @@ https://www.modularity.group
 
 1. Enqueues the theme `style.css` in frontend and admin block editor
 
-2. Looking in `wp-content/modules/` and `your-theme/modules/`
+2. Looking in `your-theme/modules/` and `../some-module/submodules/` to:
 
-  - includes `foomodule/foomodule.php`
+  - include `foomodule/foomodule.php`
 
-  - enqueues `foomodule/foomodule.js`
+  - enqueue `foomodule/foomodule.js`
 
-  - enqueues `foomodule/foomodule.editor.js`
+  - enqueue `foomodule/foomodule.editor.js`
 
-  - compiles & autoprefixes `foomodule/foomodule.scss` and enqueues resulting `foomodule/foomodule.css`
+  - compile & autoprefix `foomodule/*.scss`
 
-  - compiles & autoprefixes `foomodule/foomodule.editor.scss` and enqueues `foomodule/foomodule.editor.css`
+  - enqueue `foomodule/foomodule.css`
 
-  - auto-generates block editor styles if string `generate_editor_styles` is present in `foomodule.scss`
+  - enqueue `foomodule/foomodule.editor.css`
 
-3. Looking in `foomodule/submodules/barmodule` to do the same
+  - auto-generate editor styles if string `generate_editor_styles` present in `*.scss`
 
-4. Adds a `Compile Modules` button to the adminbar for administrators
+3. Adds an admin information page with `compile modules` button
