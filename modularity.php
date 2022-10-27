@@ -18,7 +18,7 @@ if (!class_exists("Modularity")) {
       require_once "includes/ModularityBase.php";
     }
 
-    public function data() {
+    static function data() {
       return get_plugin_data(__FILE__);
     }
   }
