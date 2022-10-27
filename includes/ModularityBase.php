@@ -18,7 +18,7 @@ if (!class_exists("ModularityBase")) {
       }
       $this->addStylesheet();
     }
-    
+
     private function modules() {
       return array_merge(
         glob(WP_CONTENT_DIR . "/modules/[!_]*"),
@@ -27,20 +27,21 @@ if (!class_exists("ModularityBase")) {
         glob(get_stylesheet_directory() . "/modules/[!_]*/submodules/[!_]*")
       );
     }
-    
+
     private function adminpage() {
       add_action("modularity/admin_page_content", function(){
         ?>
-          <h1><?= ucwords(str_replace("-", " ", basename(dirname(__DIR__)))) ?></h1>
+          <h1><?= Modularity::data()["Name"] ?></h1>
+          <p>Modular Development-System for WordPress</p>
+          <p>Version <?= Modularity::data()["Version"] ?></p>
           <p>
-            Modular Development-System for WordPress.<br><br>
-            <a href="https://modularity.group" class="button button-primary" target="_blank">Learn more</a>&nbsp;
+            <a href="https://modularity.group" class="button button-primary" target="_blank">Get started</a>&nbsp;
             <a href="<?= home_url("?compile") ?>" class="button" target="_blank">Compile modules</a><br><br>
           </p>
         <?php
       }, 5);
     }
   }
-  
+
   $ModularityBase = new ModularityBase();
 }
