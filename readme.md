@@ -8,7 +8,7 @@ Version 5, MIT License
 https://www.modularity.group
 
 
-## What this plugin does
+## Features
 
 1. Enqueues the theme `style.css` in frontend and admin block editor
 
