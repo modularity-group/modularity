@@ -31,9 +31,9 @@ if (!class_exists("ModularityBase")) {
     private function adminpage() {
       add_action("modularity/admin_page_content", function(){
         ?>
-          <h1><?= Modularity::data()["Name"] ?></h1>
+          <h1><?= Modularity::name() ?></h1>
           <p>Modular Development-System for WordPress</p>
-          <p>Version <?= Modularity::data()["Version"] ?></p>
+          <p>Version <?= Modularity::version() ?></p>
           <p>
             <a href="https://modularity.group" class="button button-primary" target="_blank">Get started</a>&nbsp;
             <a href="<?= home_url("?compile") ?>" class="button" target="_blank">Compile modules</a><br><br>

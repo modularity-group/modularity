@@ -138,7 +138,8 @@ if (!class_exists("ModularityCore")) {
     }
 
     protected function dirToPath($directory) {
-      return "/wp-content/" . explode("/wp-content/", $directory)[1];
+      $contentFolder = defined("WP_CONTENT_FOLDERNAME") ? WP_CONTENT_FOLDERNAME : "wp-content";
+      return "/$contentFolder/" . explode("/$contentFolder/", $directory)[1];
     }
 
     protected function sassToCssPath($scss) {
