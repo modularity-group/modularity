@@ -26,6 +26,6 @@ https://www.modularity.group
 
   - enqueue `foomodule/foomodule.editor.css`
 
-  - auto-generate editor styles if string `generate_editor_styles` present in `*.scss`
+  - auto-generate editor styles from `// generate_editor_styles` present in `*.scss`
 
 3. Adds an admin information page with `compile modules` button

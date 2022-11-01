@@ -68,7 +68,8 @@ if (!class_exists("ModularityCore")) {
         $css = $compiler->compileString($scss)->getCss();
         $this->saveAutoprefixSCSS($moduleSCSS, $css);
         if (strpos($scss, "generate_editor_styles")) {
-          $cssEditor = $compiler->compileString('.editor-styles-wrapper .is-root-container {'.$scss.'}')->getCss();
+          $scssEditor = str_replace("generate_editor_styles", "\n.editor-styles-wrapper .is-root-container {", $scss)."}";
+          $cssEditor = $compiler->compileString($scssEditor)->getCss();
           $this->saveAutoprefixSCSS(str_replace(".scss", ".editor.scss", $moduleSCSS), $cssEditor);
         }
       }

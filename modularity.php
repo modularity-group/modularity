@@ -19,15 +19,15 @@ if (!class_exists("Modularity")) {
     }
 
     static function name() {
-      return "Modularity Pro";
+      return "Modularity";
     }
 
     static function version() {
-      return "1.0.0.beta6";
+      return "5.0.3.beta1";
     }
 
     static function github() {
-      return "modularity5-group/modularity-pro";
+      return "modularity-group/modularity";
     }
 
     static function path() {
