@@ -3,7 +3,7 @@
 Plugin Name: Modularity
 Plugin URI:  https://github.com/modularity-group/modularity
 Description: Modular Theme Development-System for WordPress
-Version:     5.0.3.beta1
+Version:     5.0.3
 Author:      Modularity Group
 Author URI:  https://www.modularity.group
 Text Domain: modularity
@@ -23,7 +23,7 @@ if (!class_exists("Modularity")) {
     }
 
     static function version() {
-      return "5.0.3.beta1";
+      return "5.0.3";
     }
 
     static function github() {
