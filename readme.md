@@ -1,31 +1,42 @@
 
 # Modularity
 
-Modular Development-System for WordPress
+Modular Theme Development-System for WordPress
 
 Version 5, MIT License
 
-https://www.modularity.group
+Copyright © 2022 [Modularity Group](https://www.modularity.group)
 
+---
 
-## Features
+Modularity compiles and loads modular components from your theme. 
 
-1. Enqueues the theme `style.css` in frontend and admin block editor
+It regards all modules inside `your-theme/modules/` which may look like this:
 
-2. Looking in `your-theme/modules/` and `../some-module/submodules/` to:
+![Example Theme and Module Screenshot](https://static.modularity.group/modularity-pro-docu-module-example.png)
 
-  - include `foomodule/foomodule.php`
+The anatomy of a module is as shown below where all files are optional:
 
-  - enqueue `foomodule/foomodule.js`
+```
+example/
+  example.php --- included
+  example.template.php
+  example.scss --- compiled, prefixed, enqueued in front-end
+  example.editor.scss --- compiled, prefixed, enqueued in editor
+  example.block.scss --- compiled, prefixed
+  example.js - enqueued in front-end
+  example.editor.js --- enqueued in editor
+  submodules/ --- modules inside are processed alike
+  readme.md
+```
 
-  - enqueue `foomodule/foomodule.editor.js`
+Any `.scss` file will be compiled if the resulting `.css` file does not exist already.
 
-  - compile & autoprefix `foomodule/*.scss`
+To re-compile everything just open your site and append `?compile` or `?c` to the URL.  
+There is also a `compile modules` button on the Modularity admin page.
 
-  - enqueue `foomodule/foomodule.css`
+For easier shared styles between front-end and editor you can have your editor styles be auto-generated.  
+Add the key `// generate_editor_styles` into any `.scss` which creates the corresponding `.editor.css`.  
+All code after this key is wrapped inside `.editor-styles-wrapper .is-root-container { }`.
 
-  - enqueue `foomodule/foomodule.editor.css`
-
-  - auto-generate editor styles from `// generate_editor_styles` present in `*.scss`
-
-3. Adds an admin information page with `compile modules` button
+The `style.css` of your theme is enqueued in front-end and editor as well.
