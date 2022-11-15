@@ -30,10 +30,8 @@ example/
   readme.md
 ```
 
-For easier shared styles between front-end and editor you can have your editor styles be auto-generated.
-
-Add the key `// generate_editor_styles` into any `.scss` which creates the corresponding `.editor.css`.
-
+For easier shared styles between front-end and editor you can have your editor styles be auto-generated.  
+Add the key `// generate_editor_styles` into any `.scss` which creates the corresponding `.editor.css`.  
 All code after this key is additionaly wrapped inside `.editor-styles-wrapper .is-root-container { }`.
 
 The `style.css` of your theme is enqueued in front-end and editor as well.
