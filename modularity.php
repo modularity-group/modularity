@@ -5,7 +5,7 @@ Plugin URI:  https://github.com/modularity-group/modularity
 Description: Modular Theme Development-System for WordPress
 Version:     5.0.4.RC1
 Author:      Modularity Group
-Author URI:  https://www.modularity.group
+Author URI:  https://modularity.group
 Text Domain: modularity
 */
 
