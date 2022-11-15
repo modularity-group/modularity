@@ -4,25 +4,21 @@ use ScssPhp\ScssPhp\Compiler;
 use ScssPhp\ScssPhp\OutputStyle;
 use Padaliyajay\PHPAutoprefixer\Autoprefixer;
 
-if (!class_exists("ModularityCore")) {
+if (!class_exists("Modularity")) {
 
-  class ModularityCore {
+  class Modularity {
 
-    private $siteStyles;
-    private $siteScripts;
-    private $editorStyles;
-    private $editorScripts;
+    private $siteStyles = [];
+    private $siteScripts = [];
+    private $editorStyles = [];
+    private $editorScripts = [];
 
-    public function __construct() {
-      $this->enqueue();
-    }
+    public function __construct() {}
 
     public function init() {
-      $this->siteStyles = [];
-      $this->siteScripts = [];
-      $this->editorStyles = [];
-      $this->editorScripts = [];
-      $this->adminpage();
+      $this->load();
+      $this->enqueue();
+      $this->admin();
     }
 
     public function enqueueSiteStyles() {
@@ -41,15 +37,31 @@ if (!class_exists("ModularityCore")) {
       $this->enqueueScripts($this->editorScripts);
     }
 
-    private function enqueue() {
-      add_action('wp_enqueue_scripts', [$this, 'enqueueSiteStyles'], 20);
-      add_action('enqueue_block_editor_assets', [$this, 'enqueueEditorStyles'], 20);
-      add_action('wp_enqueue_scripts', [$this, 'enqueueSiteScripts'], 20);
-      add_action('enqueue_block_editor_assets', [$this, 'enqueueEditorScripts'], 20);
+    public function getAdminContent() {
+      $this->adminContent();
+    }
+
+    private function load() {
+      foreach ($this->modules() as $module) {
+        $this->loadPHP($module);
+        $this->compileSassFiles($module);
+        $this->addAssets($module);
+      }
+      $this->addStylesheet();
+    }
+
+    private function modules() {
+      return array_merge(
+        glob(WP_CONTENT_DIR . "/modules/[!_]*"),
+        glob(WP_CONTENT_DIR . "/modules/[!_]*/submodules/[!_]*"),
+        glob(get_stylesheet_directory() . "/modules/[!_]*"),
+        glob(get_stylesheet_directory() . "/modules/[!_]*/submodules/[!_]*")
+      );
     }
 
     private function shouldCompile($sassFile) {
-      return isset($_GET["c"]) || isset($_GET["compile"]) || !file_exists($this->sassToCssPath($sassFile));
+      $cssFile = $this->sassToCssPath($sassFile);
+      return filemtime($sassFile) !== filemtime($cssFile) || !file_exists($cssFile);
     }
 
     private function compileSCSS($moduleSCSS) {
@@ -66,58 +78,76 @@ if (!class_exists("ModularityCore")) {
       }
       try {
         $css = $compiler->compileString($scss)->getCss();
-        $this->saveAutoprefixSCSS($moduleSCSS, $css);
-        if (strpos($scss, "generate_editor_styles")) {
-          $scssEditor = str_replace("generate_editor_styles", "\n.editor-styles-wrapper .is-root-container {", $scss)."}";
-          $cssEditor = $compiler->compileString($scssEditor)->getCss();
-          $this->saveAutoprefixSCSS(str_replace(".scss", ".editor.scss", $moduleSCSS), $cssEditor);
-        }
+        $this->prefixAndSaveCSS($moduleSCSS, $css);
+        $this->generateEditorCSS($compiler, $moduleSCSS, $scss);
       }
       catch (Exception $e) {
-        echo "Compile error in $scss:<br>" . $e->getMessage();
+        add_action("wp_body_open", function() use ($e, $moduleSCSS) {
+          echo "<code><b>" . basename($moduleSCSS) . "</b> " . $e->getMessage() . "</code>";
+        }, 100);
       }
     }
 
-    private function saveAutoprefixSCSS($moduleSCSS, $css) {
+    private function generateEditorCSS($compiler, $scssFile, $scssCode) {
+      if (!strpos($scssCode, "generate_editor_styles")) {
+        $cssFileEditor = str_replace(".scss", ".editor.css", $scssFile);
+        if (file_exists($cssFileEditor)) unlink($cssFileEditor);
+        return;
+      }
+      try {
+        $codeWrapEditor = ".editor-styles-wrapper .is-root-container";
+        $scssCodeEditor = str_replace("generate_editor_styles", "\n$codeWrapEditor {", $scssCode)."}";
+        $cssCodeEditor = $compiler->compileString($scssCodeEditor)->getCss();
+        $this->prefixAndSaveCSS(str_replace(".scss", ".editor.scss", $scssFile), $cssCodeEditor);
+      }
+      catch (Exception $e) {
+        add_action("wp_body_open", function() use ($e, $scssFile) {
+          echo "<code><b>" . basename($scssFile) . "</b> " . $e->getMessage() . "</code>";
+        }, 100);
+      }
+    }
+
+    private function prefixAndSaveCSS($moduleSCSS, $css) {
       $autoprefixer = new Autoprefixer('@charset "UTF-8";' . $css);
       $css = $autoprefixer->compile();
+      if (file_exists($moduleSCSS)) touch($moduleSCSS);
       return file_put_contents($this->sassToCssPath($moduleSCSS), $css);
+    }
+
+    private function prefixEnqueue($file) {
+      if (basename($file) === "style.css") return "theme-";
+      $isSubmodule = strpos($file, "/submodules/");
+      if (strpos($file, "/plugins/")) {
+        return $isSubmodule ? basename(dirname(dirname(dirname($file)))) . "-submodule-" : "";
+      }
+      return $isSubmodule ? "module-" . basename(dirname(dirname(dirname($file)))) . "-submodule-" : "module-";
     }
 
     private function enqueueStyles($stylesheets=[]) {
       foreach ($stylesheets as $file) {
         if (file_exists($file)) {
           wp_enqueue_style(
-            $this->prefixEnqueue($file) . basename($file, ".css"), $this->dirToPath($file), [], filemtime($file), 'all'
+            $this->prefixEnqueue($file) . basename($file, ".css"),
+            $this->dirToPath($file), [], filemtime($file), 'all'
           );
         }
       }
-    }
-
-    private function prefixEnqueue($file) {
-      if (basename($file) === "style.css") {
-        return "theme-";
-      }
-      if (strpos($file, "/plugins/")) {
-        if (strpos($file, "/submodules/")) {
-          return basename(dirname(dirname(dirname($file)))) . "-submodule-";
-        }
-        return "";
-      }
-      if (strpos($file, "/submodules/")) {
-        return "module-" . basename(dirname(dirname(dirname($file)))) . "-submodule-";
-      }
-      return "module-";
     }
 
     private function enqueueScripts($scripts=[]) {
       foreach ($scripts as $file) {
         if (file_exists($file)) {
           wp_enqueue_script(
-            $this->prefixEnqueue($file).basename($file, ".js"), $this->dirToPath($file), [], filemtime($file), true
+            $this->prefixEnqueue($file) . basename($file, ".js"),
+            $this->dirToPath($file), [], filemtime($file), true
           );
         }
       }
+    }
+
+    private function admin() {
+      $this->adminpage();
+      add_action("modularity/admin_page_content", [$this, 'getAdminContent'], 5);
     }
 
     private function adminpage() {
@@ -130,6 +160,25 @@ if (!class_exists("ModularityCore")) {
           <?php
         }, $this->logo(), 59);
       });
+    }
+
+    private function adminContent() {
+      ?>
+        <h1><?= MODULARITY_NAME ?></h1>
+        <p>Modular Development-System for WordPress</p>
+        <p>Version <?= MODULARITY_VERSION ?></p>
+        <a href="https://modularity.group" class="button button-primary" target="_blank">Get started</a>&nbsp;
+        <?php if (MODULARITY_NAME === "Modularity"): ?>
+          <a href="https://modularity.group/pro" class="button" target="_blank">Go Pro</a><br><br>
+        <?php endif; ?>
+      <?php
+    }
+
+    protected function enqueue($priority=25) {
+      add_action('wp_enqueue_scripts', [$this, 'enqueueSiteStyles'], $priority);
+      add_action('enqueue_block_editor_assets', [$this, 'enqueueEditorStyles'], $priority);
+      add_action('wp_enqueue_scripts', [$this, 'enqueueSiteScripts'], $priority);
+      add_action('enqueue_block_editor_assets', [$this, 'enqueueEditorScripts'], $priority);
     }
 
     protected function addStylesheet() {
@@ -152,7 +201,7 @@ if (!class_exists("ModularityCore")) {
         $php = "$module/".basename($module).".php";
         if (!file_exists($php)) return;
         try {
-          require_once($php);
+          require_once $php;
         }
         catch (Exception $error) {
           add_action("admin_notices", function() {
@@ -183,6 +232,6 @@ if (!class_exists("ModularityCore")) {
     }
   }
 
-  $ModularityCore = new ModularityCore();
-  $ModularityCore->init();
+  $Modularity = new Modularity();
+  $Modularity->init();
 }

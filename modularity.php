@@ -3,37 +3,18 @@
 Plugin Name: Modularity
 Plugin URI:  https://github.com/modularity-group/modularity
 Description: Modular Theme Development-System for WordPress
-Version:     5.0.3
+Version:     5.0.4.RC1
 Author:      Modularity Group
 Author URI:  https://www.modularity.group
 Text Domain: modularity
 */
 
-if (!class_exists("Modularity")) {
+define("MODULARITY_NAME", "Modularity");
 
-  class Modularity {
+define("MODULARITY_VERSION", "5.0.4.RC1");
 
-    public function __construct() {
-      require_once "includes/ModularityCore.php";
-      require_once "includes/ModularityBase.php";
-    }
+define("MODULARITY_GITHUB", "modularity-group/modularity");
 
-    static function name() {
-      return "Modularity";
-    }
+define("MODULARITY_PATH", dirname(__FILE__));
 
-    static function version() {
-      return "5.0.3";
-    }
-
-    static function github() {
-      return "modularity-group/modularity";
-    }
-
-    static function path() {
-      return dirname(__FILE__);
-    }
-  }
-
-  $Modularity = new Modularity();
-}
+require_once "includes/Modularity.php";

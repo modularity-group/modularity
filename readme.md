@@ -30,13 +30,10 @@ example/
   readme.md
 ```
 
-Any `.scss` file will be compiled if the resulting `.css` file does not exist already.
+For easier shared styles between front-end and editor you can have your editor styles be auto-generated.
 
-To re-compile everything just open your site and append `?compile` or `?c` to the URL.  
-There is also a `compile modules` button on the Modularity admin page.
+Add the key `// generate_editor_styles` into any `.scss` which creates the corresponding `.editor.css`.
 
-For easier shared styles between front-end and editor you can have your editor styles be auto-generated.  
-Add the key `// generate_editor_styles` into any `.scss` which creates the corresponding `.editor.css`.  
-All code after this key is wrapped inside `.editor-styles-wrapper .is-root-container { }`.
+All code after this key is additionaly wrapped inside `.editor-styles-wrapper .is-root-container { }`.
 
 The `style.css` of your theme is enqueued in front-end and editor as well.
