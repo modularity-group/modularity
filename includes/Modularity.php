@@ -61,7 +61,7 @@ if (!class_exists("Modularity")) {
 
     private function shouldCompile($sassFile) {
       $cssFile = $this->sassToCssPath($sassFile);
-      return filemtime($sassFile) !== filemtime($cssFile) || !file_exists($cssFile);
+      return !file_exists($cssFile) || filemtime($sassFile) !== filemtime($cssFile);
     }
 
     private function compileSCSS($moduleSCSS) {
