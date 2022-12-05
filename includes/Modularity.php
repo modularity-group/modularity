@@ -120,7 +120,10 @@ if (!class_exists("Modularity")) {
       if (strpos($file, "/plugins/")) {
         return $isSubmodule ? basename(dirname(dirname(dirname($file)))) . "-submodule-" : "";
       }
-      return $isSubmodule ? "module-" . basename(dirname(dirname(dirname($file)))) . "-submodule-" : "module-";
+      if ($isSubmodule) {
+        return "theme-module-" . basename(dirname(dirname(dirname($file)))) . "-submodule-";
+      }
+      return "theme-module-";
     }
 
     private function enqueueStyles($stylesheets=[]) {
