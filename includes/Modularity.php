@@ -109,7 +109,7 @@ if (!class_exists("Modularity")) {
 
     private function prefixAndSaveCSS($moduleSCSS, $css) {
       $autoprefixer = new Autoprefixer('@charset "UTF-8";' . $css);
-      $css = $autoprefixer->compile();
+      $css = $autoprefixer->compile(false);
       if (file_exists($moduleSCSS)) touch($moduleSCSS);
       return file_put_contents($this->sassToCssPath($moduleSCSS), $css);
     }
@@ -188,6 +188,14 @@ if (!class_exists("Modularity")) {
       $style = get_stylesheet_directory() . "/style.css";
       $this->siteStyles[] = $style;
       $this->editorStyles[] = $style;
+    }
+
+    protected function loadLanguages($module) {
+      if (is_dir("$module/languages")) {
+        add_action('init', function() use ($module) {
+          load_plugin_textdomain(basename($module), false, basename($module)."/languages/");
+        });
+      }
     }
 
     protected function dirToPath($directory) {

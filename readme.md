@@ -26,6 +26,7 @@ example/
   example.block.scss --- compiled, prefixed
   example.js - enqueued in front-end
   example.editor.js --- enqueued in editor
+  languages/ --- loaded
   submodules/ --- modules inside are processed alike
   readme.md
 ```
