@@ -167,11 +167,17 @@ if (!class_exists("Modularity")) {
 
     private function adminContent() {
       ?>
+        <?php if (defined('MODULARITY_COMPILE')): ?>
+          <div class="notice notice-info">
+            <p><b>MODULARITY_COMPILE</b> is defined! Don't forget to disable forced compiling.</p>
+          </div>
+        <?php endif; ?>
         <h1><?= MODULARITY_NAME ?></h1>
         <p>Modular Development-System for WordPress</p>
         <p>Version <?= MODULARITY_VERSION ?></p>
         <a href="https://modularity.group" class="button button-primary" target="_blank">Get started</a>&nbsp;
         <?php if (MODULARITY_NAME === "Modularity"): ?>
+          <a href="/<?= basename(WP_CONTENT_DIR) ?>/plugins/modularity/readme.md" class="button button-secondary" target="_blank">Readme</a>&nbsp;
           <a href="https://modularity.group/pro" class="button" target="_blank">Go Pro</a><br><br>
         <?php endif; ?>
       <?php
@@ -232,7 +238,7 @@ if (!class_exists("Modularity")) {
 
     protected function compileSassFiles($module) {
       foreach (glob("$module/[!_]*.scss") as $sassFile) {
-        if ($this->shouldCompile($sassFile)) {
+        if ($this->shouldCompile($sassFile) || defined("MODULARITY_COMPILE")) {
           $this->compileSCSS($sassFile);
         }
       }
