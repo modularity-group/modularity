@@ -89,9 +89,12 @@ if (!class_exists("Modularity")) {
     }
 
     private function generateEditorCSS($compiler, $scssFile, $scssCode) {
-      if (!defined('MODULARITY_COMPILE') && !strpos($scssCode, "generate_editor_styles")) {
+      if (!strpos($scssCode, "generate_editor_styles")) {
         $cssFileEditor = str_replace(".scss", ".editor.css", $scssFile);
-        if (file_exists($cssFileEditor)) unlink($cssFileEditor);
+        if (file_exists($cssFileEditor)) {
+          unlink($cssFileEditor);
+          $this->compileSCSS(str_replace(".scss", ".editor.scss", $scssFile));
+        }
         return;
       }
       try {
