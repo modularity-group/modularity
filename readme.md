@@ -5,7 +5,7 @@ Modular Theme Development-System for WordPress
 
 Version 5, MIT License
 
-Copyright © 2022 [Modularity Group](https://modularity.group)
+Copyright © 2023 [Modularity Group](https://modularity.group)
 
 ---
 
@@ -26,6 +26,7 @@ example/
   example.block.scss --- compiled, prefixed
   example.js - enqueued in front-end
   example.editor.js --- enqueued in editor
+  *.scss --- compiled, prefixed
   languages/ --- loaded
   submodules/ --- modules inside are processed alike
   readme.md
@@ -33,10 +34,11 @@ example/
 
 The `style.css` of your theme is enqueued in front-end and editor as well.
 
+You can force to always compile everything via `define('MODULARITY_COMPILE', true)`.
+
 ---
 
 For easier shared styles between front-end and editor you can have your editor styles be auto-generated.  
 Add the key `// generate_editor_styles` into any `.scss` which creates the corresponding `.editor.css`.  
 All code after this key is additionaly wrapped inside `.editor-styles-wrapper .is-root-container { }`.  
-But you can't have an `.editor.scss` at the same time – if you need one, import your front-end styles.  
-You can force to always compile everything via `define('MODULARITY_COMPILE', true);`.
+But you can't have an `.editor.scss` at the same time – if you need one, import your front-end styles there.  
