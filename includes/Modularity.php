@@ -16,9 +16,14 @@ if (!class_exists("Modularity")) {
     public function __construct() {}
 
     public function init() {
-      $this->load();
-      $this->enqueue();
-      $this->admin();
+      if (defined('DOING_AJAX') && DOING_AJAX) {
+        $this->load(false);
+      }
+      else {
+        $this->load();
+        $this->enqueue();
+        $this->admin();
+      }
     }
 
     public function enqueueSiteStyles() {
@@ -41,13 +46,17 @@ if (!class_exists("Modularity")) {
       $this->adminContent();
     }
 
-    private function load() {
+    private function load($styles=true) {
       foreach ($this->modules() as $module) {
         $this->loadPHP($module);
+        if (!$styles) continue;
+        $this->deleteCompiledCssFiles($module);
         $this->compileSassFiles($module);
         $this->addAssets($module);
       }
-      $this->addStylesheet();
+      if ($styles) {
+        $this->addStylesheet();
+      }
     }
 
     private function modules() {
@@ -98,8 +107,7 @@ if (!class_exists("Modularity")) {
         return;
       }
       try {
-        $codeWrapEditor = ".editor-styles-wrapper .is-root-container";
-        $scssCodeEditor = str_replace("generate_editor_styles", "\n$codeWrapEditor {", $scssCode)."}";
+        $scssCodeEditor = str_replace("generate_editor_styles", "\n.editor-styles-wrapper {", $scssCode)."}";
         $cssCodeEditor = $compiler->compileString($scssCodeEditor)->getCss();
         $this->prefixAndSaveCSS(str_replace(".scss", ".editor.scss", $scssFile), $cssCodeEditor);
       }
@@ -216,6 +224,10 @@ if (!class_exists("Modularity")) {
       return str_replace(".scss", ".css", $scss);
     }
 
+    protected function cssToScssPath($css) {
+      return str_replace(".css", ".scss", $css);
+    }
+
     protected function loadPHP($module) {
       add_action('plugins_loaded', function() use ($module) {
         $php = "$module/".basename($module).".php";
@@ -245,6 +257,13 @@ if (!class_exists("Modularity")) {
           $this->compileSCSS($sassFile);
         }
       }
+    }
+
+    protected function deleteCompiledCssFiles($module) {
+      $moduleCss = $module . "/" . basename($module) . ".css";
+      if (!file_exists($moduleCss)) return;
+      if (file_exists($this->cssToScssPath($moduleCss))) return;
+      return unlink($moduleCss) && rmdir(dirname($moduleCss));
     }
 
     protected function logo() {
