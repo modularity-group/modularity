@@ -40,5 +40,5 @@ You can force to always compile everything via `define('MODULARITY_COMPILE', tru
 
 For easier shared styles between front-end and editor you can have your editor styles be auto-generated.  
 Add the key `// generate_editor_styles` into any `.scss` which creates the corresponding `.editor.css`.  
-All code after this key is additionaly wrapped inside `.editor-styles-wrapper .is-root-container { }`.  
+All code after this key is additionaly wrapped inside `.editor-styles-wrapper { }`.  
 But you can't have an `.editor.scss` at the same time – if you need one, import your front-end styles there.  

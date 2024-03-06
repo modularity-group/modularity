@@ -2,7 +2,7 @@
 /*
 Plugin Name: Modularity
 Plugin URI:  https://github.com/modularity-group/modularity
-Description: Modular Theme Development-System for WordPress
+Description: Modular Theme Development for WordPress
 Version:     5.0.7
 Author:      Modularity Group
 Author URI:  https://modularity.group
