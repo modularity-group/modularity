@@ -43,6 +43,7 @@ if (!class_exists("Modularity")) {
     }
 
     public function getAdminContent() {
+      $this->adminStyle();
       $this->adminContent();
     }
 
@@ -176,6 +177,22 @@ if (!class_exists("Modularity")) {
       });
     }
 
+    private function adminStyle() {
+      ?>
+        <style>
+          .toplevel_page_modularity .button:not(.button-primary) {color:#896CD6;border-color:#896CD6}
+          .toplevel_page_modularity .button:hover,
+          .toplevel_page_modularity .button:active,
+          .toplevel_page_modularity .button:focus {color:#896CD6;border-color:#896CD6;background:#fff}
+          .toplevel_page_modularity .button-primary {background:#896CD6;border-color:#896CD6}
+          .toplevel_page_modularity .button-primary:hover,
+          .toplevel_page_modularity .button-primary:focus {background:#795CC6;border-color:#795CC6;color:#fff}
+          .toplevel_page_modularity .button.button-secondary {color:#896CD6;border-color:#896CD6}
+          .toplevel_page_modularity .button:focus {box-shadow: 0 0 0 1px #896CD6}
+        </style>
+      <?php
+    }
+
     private function adminContent() {
       ?>
         <?php if (defined('MODULARITY_COMPILE')): ?>
@@ -189,7 +206,6 @@ if (!class_exists("Modularity")) {
         <a href="https://modularity.group" class="button button-primary" target="_blank">Get started</a>&nbsp;
         <?php if (MODULARITY_NAME === "Modularity"): ?>
           <a href="/<?= basename(WP_CONTENT_DIR) ?>/plugins/modularity/readme.md" class="button button-secondary" target="_blank">Readme</a>&nbsp;
-          <a href="https://modularity.group/pro" class="button" target="_blank">Go Pro</a><br><br>
         <?php endif; ?>
       <?php
     }

@@ -5,7 +5,7 @@ Modular Theme Development-System for WordPress
 
 Version 5, MIT License
 
-Copyright © 2023 [Modularity Group](https://modularity.group)
+Copyright © 2024 [Modularity Group](https://modularity.group)
 
 ---
 
