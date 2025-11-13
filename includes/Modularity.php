@@ -213,6 +213,7 @@ if (!class_exists("Modularity")) {
     protected function enqueue($priority=25) {
       add_action('wp_enqueue_scripts', [$this, 'enqueueSiteStyles'], $priority);
       add_action('enqueue_block_editor_assets', [$this, 'enqueueEditorStyles'], $priority);
+      add_action('enqueue_block_assets', [$this, 'enqueueEditorStyles'], $priority);
       add_action('wp_enqueue_scripts', [$this, 'enqueueSiteScripts'], $priority);
       add_action('enqueue_block_editor_assets', [$this, 'enqueueEditorScripts'], $priority);
     }
