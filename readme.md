@@ -5,15 +5,13 @@ Modular Theme Development-System for WordPress
 
 Version 5, MIT License
 
-Copyright © 2024 [Modularity Group](https://modularity.group)
+Copyright © 2025 [Modularity Group](https://modularity.group)
 
 ---
 
 Modularity compiles and loads modular components from your theme. 
 
 It regards all modules inside `your-theme/modules/` which may look like this:
-
-![Example Theme and Module Screenshot](https://static.modularity.group/modularity-pro-docu-module-example.png)
 
 The anatomy of a module is as shown below where all files are optional:
 
